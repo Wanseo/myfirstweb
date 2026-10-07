@@ -17,7 +17,7 @@ export function initGuestbookMusic(root: HTMLElement) {
   let step = 0
   let nextNote = 0
   const voices = new Set<OscillatorNode>()
-  const eighth = 60 / 140 / 2
+  const eighth = 60 / 170 / 2
   const updateButton = () => {
     button.classList.toggle('is-muted', !enabled)
     button.setAttribute('aria-pressed', String(enabled))
