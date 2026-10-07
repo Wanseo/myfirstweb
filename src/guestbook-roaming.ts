@@ -124,7 +124,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   const start = () => { previous = 0; if (!frame && active && !list && !reduced.matches && !document.hidden) frame = requestAnimationFrame(tick) }
   const applyLayout = () => {
     root.classList.toggle('guestbook-list-mode', list || reduced.matches)
-    toggle.textContent = list || reduced.matches ? '돌아다니기 ↗' : '목록 보기 ☰'
+    toggle.textContent = list || reduced.matches ? '돌아다니기 ↗' : 'list ☰'
     toggle.setAttribute('aria-pressed', String(list || reduced.matches))
     cancelAnimationFrame(frame); frame = 0
     walkers.forEach(walker => {

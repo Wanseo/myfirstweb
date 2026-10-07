@@ -35,7 +35,7 @@ export const guestbookMarkup = `
           </div>
         </form>
         <section class="guestbook-board" aria-label="방문자들의 말풍선">
-          <div class="guestbook-board-heading"><span id="guestbook-count" hidden>0</span><button id="guestbook-layout" type="button" aria-pressed="false">목록 보기 ☰</button><button id="guestbook-refresh" type="button">새로고침 ↻</button></div>
+          <div class="guestbook-board-heading"><span id="guestbook-count" hidden>0</span><button id="guestbook-layout" type="button" aria-pressed="false">list ☰</button><button id="guestbook-refresh" type="button">reload ↻</button></div>
           <p id="guestbook-connection" hidden></p>
           <p id="guestbook-empty">아직 이야기가 없어요. 첫 번째 인사를 남겨 주세요!</p>
           <div class="guestbook-notes" id="guestbook-notes"></div>
@@ -244,7 +244,7 @@ export function initGuestbook(root: HTMLElement) {
       entries.set(saved.id, saved)
       render(wasEditing ? undefined : saved.id)
       resetEditor()
-      status.textContent = wasEditing ? '수정한 내용이 저장됐어요!' : canEdit ? '저장됐어요! 이 브라우저에서 목록 보기 → 수정으로 바꿀 수 있어요.' : '저장됐어요! 수정 기능은 Supabase 추가 설정 후 작성한 글부터 사용할 수 있어요.' 
+      status.textContent = wasEditing ? '수정한 내용이 저장됐어요!' : canEdit ? '저장됐어요! 이 브라우저에서 list → 수정으로 바꿀 수 있어요.' : '저장됐어요! 수정 기능은 Supabase 추가 설정 후 작성한 글부터 사용할 수 있어요.' 
     } catch {
       status.textContent = '저장하지 못했어요. 입력 내용은 유지됩니다. 연결과 Supabase 설정을 확인해 주세요.'
     } finally {
