@@ -5,8 +5,31 @@ import nightLandscape from './assets/guestbook-landscape-night.svg?raw'
 export function initGuestbookCamera(root: HTMLElement) {
   const button = root.querySelector<HTMLButtonElement>('#guestbook-camera')!
   const status = root.querySelector<HTMLElement>('#guestbook-camera-status')!
+  let pendingShare: File | undefined
+  const share = async (file: File) => {
+    try {
+      await navigator.share({ files: [file] })
+      pendingShare = undefined
+      status.textContent = ''
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        pendingShare = undefined
+        status.textContent = ''
+      } else {
+        pendingShare = file
+        status.textContent = '카메라를 한 번 더 누르면 저장·공유 창이 열려요.'
+      }
+    } finally {
+      root.dispatchEvent(new Event('guestbook-capture-complete'))
+    }
+  }
   button.addEventListener('click', async () => {
     if (button.disabled) return
+    if (innerWidth <= 700 && pendingShare) {
+      button.disabled = true
+      try { await share(pendingShare) } finally { button.disabled = false }
+      return
+    }
     button.disabled = true
     button.setAttribute('aria-busy', 'true')
     root.classList.add('is-capturing')
@@ -101,12 +124,20 @@ export function initGuestbookCamera(root: HTMLElement) {
       context.drawImage(landscape, (composed.width - 105 * cover) / 2, (composed.height - 54 * cover) / 2, 105 * cover, 54 * cover)
       context.drawImage(canvas, 0, 0)
       const blob = await new Promise<Blob>((resolve, reject) => composed.toBlob(value => value ? resolve(value) : reject(new Error('PNG encoding failed')), 'image/png'))
+      const stamp = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date()).replace(/[^0-9]/g, '')
+      if (innerWidth <= 700) {
+        const file = new File([blob], `guestbook-${stamp}.png`, { type: 'image/png' })
+        if (typeof navigator.share === 'function' && navigator.canShare?.({ files: [file] })) {
+          await share(file)
+        } else {
+          status.textContent = '이 앱은 이미지 공유를 지원하지 않아요. Safari에서 열어 주세요.'
+        }
+        return
+      }
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
-      const stamp = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date()).replace(/[^0-9]/g, '')
       link.href = url
       link.download = `guestbook-${stamp}.png`
-      if (innerWidth <= 700) link.target = '_blank'
       link.style.display = 'none'
       link.rel = 'noopener'
       document.body.append(link)
