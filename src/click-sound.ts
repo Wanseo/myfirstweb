@@ -19,6 +19,11 @@ export function initClickSound() {
     if (event.pointerType === 'touch') {
       touch = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false,
         button: event.target instanceof Element ? event.target.closest('button') : null }
+      if (matchMedia('(max-width: 700px)').matches && touch.button?.matches('.guestbook-form button[type="submit"]') && !touch.button.disabled) {
+        // Keep the keyboard from shifting the button between touch-down and release.
+        event.preventDefault()
+        touch.button.setPointerCapture(event.pointerId)
+      }
     } else if (event.button === 0) play()
   }, { capture: true })
   document.addEventListener('pointermove', event => {
@@ -32,7 +37,8 @@ export function initClickSound() {
     if (tap.moved) return
     play()
     const releasedButton = document.elementFromPoint(event.clientX, event.clientY)?.closest('button')
-    if (matchMedia('(max-width: 700px)').matches && tap.button && releasedButton === tap.button && !tap.button.disabled) {
+    const capturedCommit = tap.button?.matches('.guestbook-form button[type="submit"]') && tap.button.hasPointerCapture(event.pointerId)
+    if (matchMedia('(max-width: 700px)').matches && tap.button && (releasedButton === tap.button || capturedCommit) && !tap.button.disabled) {
       handledButton = tap.button
       handledAt = performance.now()
       tap.button.click()
