@@ -85,7 +85,10 @@ export function initGuestbookMusic(root: HTMLElement) {
     if (event.target instanceof Node && button.contains(event.target)) return
     if (enabled && context?.state !== 'running') void sync()
   }
-  document.addEventListener('pointerdown', unlock)
+  document.addEventListener('pointerdown', unlock, { capture: true })
+  document.addEventListener('touchstart', unlock, { capture: true, passive: true })
+  document.addEventListener('touchend', unlock, { capture: true, passive: true })
+  document.addEventListener('click', unlock, { capture: true })
   document.addEventListener('keydown', unlock)
   document.addEventListener('visibilitychange', () => { void sync() })
   window.addEventListener('pagehide', stop)
