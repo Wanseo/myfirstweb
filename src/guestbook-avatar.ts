@@ -45,7 +45,8 @@ export function createGuestbookAvatar(character: number, frame = 0): HTMLImageEl
   face.setAttribute('shape-rendering', 'crispEdges')
   face.classList.add('guestbook-dog-face')
   const { x, y, color } = expression
-  face.innerHTML = `<rect x="${x - 18}" y="${y - 2}" width="36" height="26" fill="${color}"/><path fill="#000" d="M${x - 11} ${y}h5v6h-5ZM${x + 7} ${y}h5v6h-5ZM${x - 5} ${y + 7}h12v6h-12Z"/>`
+  const [maskX, maskY, maskWidth, maskHeight] = expression.mask ?? [x - 18, y - 2, 36, 26]
+  face.innerHTML = `<rect x="${maskX}" y="${maskY}" width="${maskWidth}" height="${maskHeight}" fill="${color}"/><path fill="#000" d="M${x - 11} ${y}h5v6h-5ZM${x + 7} ${y}h5v6h-5ZM${x - 5} ${y + 7}h12v6h-12Z"/>`
   portrait.append(avatar, face)
   return portrait
 }
