@@ -3508,7 +3508,7 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 /* Pixel night mode, with a crescent and stepped star flicker. */
 .guestbook-view { position: relative; isolation: isolate; }
 .guestbook-view.is-night { background-color: #343d58; background-image: url('./assets/guestbook-landscape-night.svg'); }
-.guestbook-night-toggle { position: fixed; top: 18px; left: 20px; z-index: 510; min-height: 44px; padding: 9px 15px; border: 2px solid #09201d; background: #bceee2; color: #09201d; box-shadow: 3px 3px 0 #09201d; font: bold .9rem monospace; cursor: pointer; }
+.guestbook-night-toggle { position: fixed; top: 18px; left: max(48px, calc((100% - 1400px) / 2 + 48px)); z-index: 510; min-height: 44px; padding: 9px 15px; border: 2px solid #09201d; background: #bceee2; color: #09201d; box-shadow: 3px 3px 0 #09201d; font: bold .9rem monospace; cursor: pointer; }
 .guestbook-night-toggle:hover { background: #d7fff3; }
 .guestbook-night-toggle:focus-visible { outline: 3px solid #fff323; outline-offset: 4px; }
 .guestbook-night-sky { display: none; position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -3519,7 +3519,7 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .is-night .guestbook-author { color: #f8f4dc; text-shadow: 1px 1px #17253a; }
 .is-night #guestbook-empty { color: #edf5db; border-color: #a6c7d0; }
 @keyframes guestbook-star-twinkle { 0%, 100% { opacity: .65; } 25% { opacity: .85; } 50% { opacity: 1; } 75% { opacity: .8; } }
-@media (max-width: 700px) { .guestbook-night-toggle { top: 12px; left: 12px; } .guestbook-pixel-moon { top: 80px; right: 10%; width: 85px; height: 85px; } }
+@media (max-width: 700px) { .guestbook-night-toggle { top: 12px; left: 22px; } .guestbook-pixel-moon { top: 80px; right: 10%; width: 85px; height: 85px; } }
 @media (prefers-reduced-motion: reduce) { .guestbook-pixel-star { animation: none; opacity: .85; } }
 
 @media (max-width: 700px) { .guestbook-pixel-star { width: calc(var(--star-size) * .7); height: calc(var(--star-size) * .7); } }
