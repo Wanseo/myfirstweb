@@ -26,7 +26,7 @@ export function createGuestbookCharacterPicker() {
   }
 }
 
-export function createGuestbookAvatar(character: number, frame = 0, mixedColors = false): HTMLImageElement | HTMLSpanElement {
+export function createGuestbookAvatar(character: number, frame = 0, mixedColors: readonly string[] | false = false): HTMLImageElement | HTMLSpanElement {
   const avatar = document.createElement('img')
   avatar.className = `guestbook-avatar guestbook-avatar--frame-${frame}`
   avatar.alt = ''
@@ -50,7 +50,7 @@ export function createGuestbookAvatar(character: number, frame = 0, mixedColors 
   face.innerHTML = `${cleanup}<path fill="#000" d="M${x - 11} ${y}h5v6h-5ZM${x + 7} ${y}h5v6h-5ZM${x - 5} ${y + 7}h12v6h-12Z"/>`
   portrait.append(avatar)
   if (mixedColors) {
-    const colors = ['#f8f5d9', '#f8f5d9', '#c6e4aa', '#a5d4bc', '#d8edc4']
+    const colors = mixedColors
     const mosaic = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
     mosaic.setAttribute('viewBox', '0 0 128 128')
     mosaic.setAttribute('aria-hidden', 'true')
