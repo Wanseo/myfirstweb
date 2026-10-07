@@ -15,16 +15,24 @@ export function createGuestbookCharacterPicker() {
   const assigned = new Map<string, number>()
   const uses = characters.map(() => 0)
   let previous = -1
+  let plainCount = 0
   return (id: string) => {
     const existing = assigned.get(id)
     if (existing !== undefined) return existing
     const minimum = Math.min(...eligibleCharacters.map(index => uses[index]!))
     let available = eligibleCharacters.filter(index => uses[index] === minimum)
+    // Prefer a shaped character once plain blobs reach roughly 40% of the
+    // current group. Stay inside the unused pool to preserve no-repeat cycles.
+    if (assigned.size > 0 && plainCount / assigned.size >= .4) {
+      const shaped = available.filter(index => index >= 56)
+      if (shaped.length) available = shaped
+    }
     if (available.length > 1) available = available.filter(index => index !== previous)
     const seed = [...id].reduce((total, char) => (total * 31 + char.charCodeAt(0)) >>> 0, 0)
     const index = available[seed % available.length]!
     uses[index] = uses[index]! + 1
     assigned.set(id, index)
+    if (index < 56) plainCount++
     previous = index
     return index
   }
