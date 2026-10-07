@@ -1,4 +1,4 @@
-type Walker = { element: HTMLElement; x: number; y: number; targetX: number; targetY: number; speed: number; seed: number; bubbleHeight: number; bubbleWidth: number; retryAt: number; detourAngle?: number; detourUntil?: number; detourSoft?: boolean; facing?: number; turnTravel?: number; lastTurnAt?: number }
+type Walker = { element: HTMLElement; x: number; y: number; targetX: number; targetY: number; speed: number; seed: number; bubbleHeight: number; bubbleWidth: number; retryAt: number; detourAngle?: number; detourUntil?: number; detourSoft?: boolean; facing?: number; turnTravel?: number; lastTurnAt?: number; motionCheckAt?: number; motionCheckX?: number; motionCheckY?: number }
 
 export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   let walkers: Walker[] = []
@@ -6,6 +6,11 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   let frame = 0
   let previous = 0
   let list = false
+  let pointer: { x: number; y: number } | undefined
+  document.addEventListener('pointermove', event => {
+    if (event.pointerType !== 'touch') pointer = { x: event.clientX, y: event.clientY }
+  }, { passive: true })
+  document.addEventListener('pointerout', event => { if (!event.relatedTarget) pointer = undefined })
   const reduced = matchMedia('(prefers-reduced-motion: reduce)')
   const toggle = root.querySelector<HTMLButtonElement>('#guestbook-layout')!
   let width = innerWidth
@@ -87,12 +92,31 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     if (!active || list || reduced.matches || document.hidden) return
     const dt = previous ? Math.min((now - previous) / 1000, .05) : 0
     previous = now
+    // Pause only the topmost character under the cursor, never keyboard focus.
+    const hovered = pointer ? document.elementFromPoint(pointer.x, pointer.y)?.closest<HTMLElement>('.guestbook-note') : null
     for (const walker of walkers) {
+      if (hovered?.dataset.entryId === walker.element.dataset.entryId) {
+        walker.element.classList.add('is-paused')
+        walker.motionCheckAt = now
+        place(walker)
+        continue
+      }
+      walker.element.classList.remove('is-paused')
       {
         if (!inBounds(walker, walker.x, walker.y)) {
           walker.x = Math.max(24, Math.min(Math.max(24, width - 92), walker.x))
           walker.y = Math.max(minY(walker), Math.min(Math.max(minY(walker), height - 120), walker.y))
           target(walker)
+        }
+        if (now - (walker.motionCheckAt ?? 0) >= 2500) {
+          if (walker.motionCheckX !== undefined && Math.hypot(walker.x - walker.motionCheckX, walker.y - walker.motionCheckY!) < 6) {
+            target(walker)
+            walker.detourAngle = Math.atan2(walker.targetY - walker.y, walker.targetX - walker.x)
+            walker.detourUntil = now + 1800
+            walker.detourSoft = true
+          }
+          walker.motionCheckAt = now
+          walker.motionCheckX = walker.x; walker.motionCheckY = walker.y
         }
         if (Math.hypot(walker.targetX - walker.x, walker.targetY - walker.y) < 3) target(walker)
         const dx = walker.targetX - walker.x, dy = walker.targetY - walker.y
