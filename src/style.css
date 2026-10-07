@@ -3538,3 +3538,10 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .guestbook-music-toggle:hover { background: #d7fff3; }
 .guestbook-music-toggle:focus-visible { outline: 3px solid #4865ee; outline-offset: 4px; }
 @media (max-width: 700px) { .guestbook-music-toggle { top: 12px; left: 132px; font-size: .75rem; padding: 9px 8px; } }
+
+/* A black pixel note replaces the music label; the slash indicates mute. */
+.guestbook-music-toggle { width: 44px; height: 44px; min-height: 44px; display: grid; place-items: center; padding: 4px; border: 0; background: transparent; box-shadow: none; }
+.guestbook-music-toggle:hover { background: #bceee260; }
+.guestbook-music-icon { display: block; width: 36px; height: 36px; image-rendering: pixelated; }
+.guestbook-music-slash { display: none; }
+.guestbook-music-toggle.is-muted .guestbook-music-slash { display: block; }
