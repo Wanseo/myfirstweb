@@ -105,6 +105,35 @@ export function initGuestbookCamera(root: HTMLElement) {
       const link = document.createElement('a')
       const stamp = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date()).replace(/[^0-9]/g, '')
       const file = new File([blob], `guestbook-${stamp}.png`, { type: 'image/png' })
+      const instagramIPhone = /iPhone/i.test(navigator.userAgent) && /Instagram/i.test(navigator.userAgent)
+      if (instagramIPhone) {
+        const save = document.createElement('button')
+        save.type = 'button'
+        save.textContent = '이미지 저장'
+        save.addEventListener('click', async () => {
+          if (navigator.canShare?.({ files: [file] })) {
+            try {
+              await navigator.share({ files: [file] })
+              status.textContent = ''
+              return
+            } catch (error) {
+              if (error instanceof DOMException && error.name === 'AbortError') return
+            }
+          }
+          const download = document.createElement('a')
+          download.href = url
+          download.download = file.name
+          download.target = '_blank'
+          download.rel = 'noopener'
+          document.body.append(download)
+          download.click()
+          download.remove()
+          status.textContent = '이미지를 길게 눌러 저장한 뒤 이 화면으로 돌아오세요.'
+        })
+        status.replaceChildren(save)
+        window.setTimeout(() => URL.revokeObjectURL(url), 300000)
+        return
+      }
       if (innerWidth <= 700 && navigator.canShare?.({ files: [file] })) {
         try {
           await navigator.share({ files: [file] })
@@ -136,7 +165,7 @@ export function initGuestbookCamera(root: HTMLElement) {
       button.disabled = false
       button.removeAttribute('aria-busy')
       root.dispatchEvent(new Event('guestbook-capture-complete'))
-      window.setTimeout(() => { status.textContent = '' }, 4000)
+      window.setTimeout(() => { if (!status.querySelector('button')) status.textContent = '' }, 4000)
     }
   })
 }
