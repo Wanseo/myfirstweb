@@ -1,4 +1,4 @@
-type Walker = { element: HTMLElement; x: number; y: number; targetX: number; targetY: number; speed: number; seed: number; bubbleHeight: number; bubbleWidth: number; retryAt: number }
+type Walker = { element: HTMLElement; x: number; y: number; targetX: number; targetY: number; speed: number; seed: number; bubbleHeight: number; bubbleWidth: number; retryAt: number; detourAngle?: number; detourUntil?: number }
 
 export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   let walkers: Walker[] = []
@@ -92,11 +92,12 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
       if (!paused) {
         const dx = walker.targetX - walker.x, dy = walker.targetY - walker.y
         if (Math.hypot(dx, dy) < 3) target(walker)
-        const angle = Math.atan2(dy, dx)
+        const angle = now < (walker.detourUntil ?? 0) ? walker.detourAngle! : Math.atan2(dy, dx)
         const step = walker.speed * dt
         const currentOverlap = crowding(walker, walker.x, walker.y)
         let bestX = walker.x, bestY = walker.y
         let bestCost = currentOverlap * 30 + Math.hypot(dx, dy)
+        let escape: { x: number; y: number; angle: number; cost: number } | undefined
         // Try forward, sideways, and backward paths. Never worsen an overlap.
         for (const turn of [0, .5, -.5, 1, -1, 1.6, -1.6, 2.3, -2.3, Math.PI]) {
           const x = walker.x + Math.cos(angle + turn) * step
@@ -105,7 +106,18 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
           const overlapScore = crowding(walker, x, y)
           if (overlapScore > currentOverlap + .001) continue
           const cost = overlapScore * 30 + Math.hypot(walker.targetX - x, walker.targetY - y)
+          // A safe sideways route may temporarily lead away from the destination.
+          // Remember it briefly so the character can go around an obstacle.
+          if (!escape || cost < escape.cost) escape = { x, y, angle: angle + turn, cost }
+          if (now < (walker.detourUntil ?? 0) && turn === 0) {
+            bestX = x; bestY = y; break
+          }
           if (cost < bestCost) { bestX = x; bestY = y; bestCost = cost }
+        }
+        if (Math.hypot(bestX - walker.x, bestY - walker.y) <= .01 && escape && step > .01) {
+          bestX = escape.x; bestY = escape.y
+          walker.detourAngle = escape.angle
+          walker.detourUntil = now + 1200
         }
         const moved = Math.hypot(bestX - walker.x, bestY - walker.y) > .01
         walker.element.classList.toggle('is-paused', !moved)
