@@ -85,9 +85,35 @@ export function createGuestbookAvatar(character: number, frame = 0): HTMLImageEl
     accessory.className = 'guestbook-character-accessory'
     accessory.style.clipPath = characterIndex === 131
       ? 'polygon(0 73%, 100% 73%, 100% 100%, 0 100%)'
-      : 'polygon(54% 0, 100% 0, 100% 100%, 54% 100%)'
+      : 'polygon(59% 0, 100% 0, 100% 100%, 54% 100%, 54% 78%, 59% 61%)'
     portrait.append(accessory)
   }
   if (characterIndex === 131) portrait.classList.add('guestbook-avatar--fixed-facing')
+  // Composite at the source's pixel resolution before scaling. SVG and PNG
+  // layers otherwise snap to different screen pixels at small display sizes.
+  if (!mixedColors) {
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = 128
+    canvas.className = 'guestbook-pixel-canvas'
+    const context = canvas.getContext('2d')!
+    const paintedFace = new Image()
+    paintedFace.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(new XMLSerializer().serializeToString(face))
+    void Promise.all([avatar.decode(), paintedFace.decode()]).then(() => {
+      context.imageSmoothingEnabled = false
+      context.drawImage(avatar, 0, 0, 128, 128)
+      context.drawImage(paintedFace, 0, 0, 128, 128)
+      if (characterIndex === 131 || characterIndex === 114) {
+        context.save()
+        context.beginPath()
+        if (characterIndex === 131) context.rect(0, 94, 128, 34)
+        else { context.moveTo(76, 0); context.lineTo(128, 0); context.lineTo(128, 128); context.lineTo(69, 128); context.lineTo(69, 100); context.lineTo(76, 78) }
+        context.clip()
+        context.drawImage(avatar, 0, 0, 128, 128)
+        context.restore()
+      }
+      portrait.append(canvas)
+      portrait.classList.add('guestbook-avatar--rasterized')
+    }).catch(() => { /* Keep the visible SVG fallback if decoding fails. */ })
+  }
   return portrait
 }
