@@ -20,7 +20,6 @@ export function initGuestbookMusic(root: HTMLElement) {
   const eighth = 60 / 104 / 2
   const updateButton = () => {
     button.classList.toggle('is-muted', !enabled)
-    button.title = enabled ? 'music off' : 'music on'
     button.setAttribute('aria-pressed', String(enabled))
     button.setAttribute('aria-label', enabled ? '배경 음악 끄기' : '8비트 배경 음악 켜기')
   }
