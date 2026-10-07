@@ -1,4 +1,4 @@
-type Walker = { element: HTMLElement; x: number; y: number; targetX: number; targetY: number; speed: number; seed: number; bubbleHeight: number; bubbleWidth: number; retryAt: number; detourAngle?: number; detourUntil?: number; facing?: number; turnTravel?: number; lastTurnAt?: number }
+type Walker = { element: HTMLElement; x: number; y: number; targetX: number; targetY: number; speed: number; seed: number; bubbleHeight: number; bubbleWidth: number; retryAt: number; detourAngle?: number; detourUntil?: number; detourSoft?: boolean; facing?: number; turnTravel?: number; lastTurnAt?: number }
 
 export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   let walkers: Walker[] = []
@@ -88,11 +88,14 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     const dt = previous ? Math.min((now - previous) / 1000, .05) : 0
     previous = now
     for (const walker of walkers) {
-      const paused = walker.element.matches(':hover, :focus-within')
-      walker.element.classList.toggle('is-paused', paused)
-      if (!paused) {
+      {
+        if (!inBounds(walker, walker.x, walker.y)) {
+          walker.x = Math.max(24, Math.min(Math.max(24, width - 92), walker.x))
+          walker.y = Math.max(minY(walker), Math.min(Math.max(minY(walker), height - 120), walker.y))
+          target(walker)
+        }
+        if (Math.hypot(walker.targetX - walker.x, walker.targetY - walker.y) < 3) target(walker)
         const dx = walker.targetX - walker.x, dy = walker.targetY - walker.y
-        if (Math.hypot(dx, dy) < 3) target(walker)
         const angle = now < (walker.detourUntil ?? 0) ? walker.detourAngle! : Math.atan2(dy, dx)
         const step = walker.speed * dt
         const currentOverlap = crowding(walker, walker.x, walker.y)
@@ -105,7 +108,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
           const y = walker.y + Math.sin(angle + turn) * step
           if (!inBounds(walker, x, y)) continue
           const overlapScore = crowding(walker, x, y)
-          if (overlapScore > currentOverlap + .001) continue
+          if (overlapScore > currentOverlap + .001 && !(walker.detourSoft && now < (walker.detourUntil ?? 0) && turn === 0)) continue
           const cost = overlapScore * 30 + Math.hypot(walker.targetX - x, walker.targetY - y)
           // A safe sideways route may temporarily lead away from the destination.
           // Remember it briefly so the character can go around an obstacle.
@@ -119,6 +122,24 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
           bestX = escape.x; bestY = escape.y
           walker.detourAngle = escape.angle
           walker.detourUntil = now + 1200
+          walker.detourSoft = false
+        }
+        if (Math.hypot(bestX - walker.x, bestY - walker.y) <= .01 && step > .01) {
+          // In a crowded pocket, briefly accept the least crowded route rather
+          // than requiring perfect separation and leaving someone stuck forever.
+          let escapeCost = Infinity
+          for (let direction = 0; direction < 32; direction++) {
+            const escapeAngle = angle + direction * Math.PI / 16
+            const x = walker.x + Math.cos(escapeAngle) * step
+            const y = walker.y + Math.sin(escapeAngle) * step
+            if (!inBounds(walker, x, y)) continue
+            const cost = crowding(walker, x, y) * 30 + Math.hypot(walker.targetX - x, walker.targetY - y)
+            if (cost < escapeCost) {
+              escapeCost = cost; bestX = x; bestY = y
+              walker.detourAngle = escapeAngle
+            }
+          }
+          if (Number.isFinite(escapeCost)) { walker.detourUntil = now + 1500; walker.detourSoft = true }
         }
         const moved = Math.hypot(bestX - walker.x, bestY - walker.y) > .01
         walker.element.classList.toggle('is-paused', !moved)
