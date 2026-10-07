@@ -3560,3 +3560,5 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 
 .guestbook-character-accessory { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
 .guestbook-walker:has(.guestbook-avatar--fixed-facing) { transform: none; }
+
+.guestbook-pixel-mosaic { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; image-rendering: pixelated; }

@@ -142,7 +142,8 @@ export function initGuestbook(root: HTMLElement) {
       walker.style.setProperty('--walk-delay', `${-(seed % 11)}s`)
       walker.style.setProperty('--stride-delay', `${-(seed % 5) * 0.12}s`)
       const character = pickCharacter(entry.id)
-      walker.append(createGuestbookAvatar(character, 0), createGuestbookAvatar(character, 1))
+      const mixedColors = entry.id === 'ab2b5ef1-46a8-4c81-9d76-1c86c6694b76'
+      walker.append(createGuestbookAvatar(character, 0, mixedColors), createGuestbookAvatar(character, 1, mixedColors))
       portrait.append(walker)
       const bubble = document.createElement('div')
       bubble.className = 'guestbook-bubble'
