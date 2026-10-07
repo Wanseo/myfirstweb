@@ -1,6 +1,6 @@
 import { initGuestbookNight } from './guestbook-night'
 import { initGuestbookRoaming } from './guestbook-roaming'
-import { createGuestbookAvatar } from './guestbook-avatar'
+import { createGuestbookAvatar, createGuestbookCharacterPicker } from './guestbook-avatar'
 import { createClient } from '@supabase/supabase-js'
 
 type Entry = { id: string; name: string; message: string; created_at: string }
@@ -74,6 +74,7 @@ export function initGuestbook(root: HTMLElement) {
   }
   const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } })
   const entries = new Map<string, Entry>()
+  const pickCharacter = createGuestbookCharacterPicker()
   const ownershipKey = `guestbook-edit-keys:${new URL(url).host}`
   let editKeys: Record<string, string> = {}
   try {
@@ -111,6 +112,8 @@ export function initGuestbook(root: HTMLElement) {
   let connected = false
   const render = (newId?: string) => {
     const ordered = [...entries.values()].sort((a, b) => b.created_at.localeCompare(a.created_at) || b.id.localeCompare(a.id))
+    // Assign older entries first so a new entry cannot change existing characters.
+    for (const entry of [...ordered].reverse()) pickCharacter(entry.id)
     const fragment = document.createDocumentFragment()
     for (const entry of ordered) {
       const note = document.createElement('article')
@@ -127,7 +130,8 @@ export function initGuestbook(root: HTMLElement) {
       walker.style.setProperty('--walk-duration', `${7 + seed % 6}s`)
       walker.style.setProperty('--walk-delay', `${-(seed % 11)}s`)
       walker.style.setProperty('--stride-delay', `${-(seed % 5) * 0.12}s`)
-      walker.append(createGuestbookAvatar(seed, 0), createGuestbookAvatar(seed, 1))
+      const character = pickCharacter(entry.id)
+      walker.append(createGuestbookAvatar(character, 0), createGuestbookAvatar(character, 1))
       portrait.append(walker)
       const bubble = document.createElement('div')
       bubble.className = 'guestbook-bubble'
