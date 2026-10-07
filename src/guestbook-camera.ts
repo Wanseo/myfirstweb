@@ -113,7 +113,7 @@ export function initGuestbookCamera(root: HTMLElement) {
       link.click()
       link.remove()
       window.setTimeout(() => URL.revokeObjectURL(url), 60000)
-      status.textContent = 'PNG 다운로드를 시작했어요.'
+      status.textContent = innerWidth <= 700 ? '이미지 저장' : 'PNG 다운로드를 시작했어요.'
     } catch {
       status.textContent = '화면 저장에 실패했어요. 다시 눌러 주세요.'
     } finally {
@@ -121,7 +121,7 @@ export function initGuestbookCamera(root: HTMLElement) {
       button.disabled = false
       button.removeAttribute('aria-busy')
       root.dispatchEvent(new Event('guestbook-capture-complete'))
-      window.setTimeout(() => { status.textContent = '' }, innerWidth <= 700 ? 2000 : 4000)
+      window.setTimeout(() => { status.textContent = '' }, innerWidth <= 700 ? 1000 : 4000)
     }
   })
 }
