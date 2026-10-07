@@ -3542,7 +3542,7 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 /* A black pixel note replaces the music label; the slash indicates mute. */
 .guestbook-music-toggle { width: 44px; height: 44px; min-height: 44px; display: grid; place-items: center; padding: 4px; border: 0; background: transparent; box-shadow: none; }
 .guestbook-music-toggle:hover { background: #bceee260; }
-.guestbook-music-icon { display: block; width: 36px; height: 36px; image-rendering: pixelated; }
+.guestbook-music-icon { display: block; width: 30px; height: 30px; image-rendering: pixelated; }
 .guestbook-music-slash { display: none; }
 .guestbook-music-toggle.is-muted .guestbook-music-slash { display: block; }
 
@@ -3574,3 +3574,5 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .guestbook-camera-status:empty { display: none; }
 .is-capturing .guestbook-avatar { animation-play-state: paused; }
 @media (max-width: 700px) { .guestbook-camera-toggle { top: 12px; left: 186px; } }
+
+.guestbook-camera-toggle svg { transform: translateY(1px); }
