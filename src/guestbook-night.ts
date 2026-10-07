@@ -3,7 +3,7 @@ export function initGuestbookNight(root: HTMLElement) {
   const stars = root.querySelector<HTMLElement>('.guestbook-pixel-stars')!
   const fragment = document.createDocumentFragment()
   const placements = [
-    { left: 29, top: 12, size: 64 },
+    { left: 42, top: 12, size: 64 },
     { left: 53, top: 32, size: 44 },
     { left: 69, top: 8, size: 54 },
     { left: 91, top: 63, size: 36 },
