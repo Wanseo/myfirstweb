@@ -34,6 +34,7 @@ export function createGuestbookAvatar(character: number, frame = 0): HTMLImageEl
   avatar.height = 77
   avatar.src = characters[character % characters.length]!
   const characterIndex = character % characters.length
+  if (characterIndex < 56) return avatar
   // Every sprite uses the same pixel eyes and smile, aligned to its own face.
   const portrait = document.createElement('span')
   portrait.className = avatar.className
@@ -44,9 +45,18 @@ export function createGuestbookAvatar(character: number, frame = 0): HTMLImageEl
   face.setAttribute('aria-hidden', 'true')
   face.setAttribute('shape-rendering', 'crispEdges')
   face.classList.add('guestbook-dog-face')
-  const { x, y, color } = expression
-  const [maskX, maskY, maskWidth, maskHeight] = expression.mask ?? [x - 18, y - 2, 36, 26]
-  face.innerHTML = `<rect x="${maskX}" y="${maskY}" width="${maskWidth}" height="${maskHeight}" fill="${color}"/><path fill="#000" d="M${x - 11} ${y}h5v6h-5ZM${x + 7} ${y}h5v6h-5ZM${x - 5} ${y + 7}h12v6h-12Z"/>`
+  const { x, y } = expression
+  const cleanup = expression.patches.map(patch => `<rect x="${patch.x}" y="${patch.y}" width="${patch.width}" height="${patch.height}" fill="${patch.color}"/>`).join('')
+  face.innerHTML = `${cleanup}<path fill="#000" d="M${x - 11} ${y}h5v6h-5ZM${x + 7} ${y}h5v6h-5ZM${x - 5} ${y + 7}h12v6h-12Z"/>`
   portrait.append(avatar, face)
+  if (characterIndex === 114 || characterIndex === 131) {
+    const accessory = avatar.cloneNode() as HTMLImageElement
+    accessory.className = 'guestbook-character-accessory'
+    accessory.style.clipPath = characterIndex === 131
+      ? 'polygon(0 73%, 100% 73%, 100% 100%, 0 100%)'
+      : 'polygon(54% 0, 100% 0, 100% 100%, 54% 100%)'
+    portrait.append(accessory)
+  }
+  if (characterIndex === 131) portrait.classList.add('guestbook-avatar--fixed-facing')
   return portrait
 }
