@@ -3611,3 +3611,19 @@ html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !imp
 @media (max-width: 700px) {
   #guestbook-layout { position: fixed; top: 72px; left: 22px; }
 }
+
+@media (max-width: 700px) {
+  .guestbook-form { width: min(100%, 180px); padding: 2px; }
+  .guestbook-window-title { min-height: 21px; gap: 3px; font-size: .68rem; }
+  .guestbook-window-icon { font-size: .75rem; }
+  .guestbook-window-controls span { width: 12px; height: 12px; font-size: 9px; }
+  .guestbook-composer-fields { padding: 5px 6px 6px; }
+  .guestbook-form label { font-size: .65rem; margin-bottom: 3px; }
+  .guestbook-form label[for="guestbook-message"] { margin-top: 6px; }
+  .guestbook-form input, .guestbook-form textarea { padding: 4px 5px; font-size: .65rem; }
+  .guestbook-form input::placeholder, .guestbook-form textarea::placeholder { font-size: .6rem; }
+  .guestbook-form textarea { height: 56px; min-height: 56px; }
+  .guestbook-form-footer { margin-top: 6px; }
+  .guestbook-form button { padding: 3px 8px; font-size: .65rem; }
+  #guestbook-length { font-size: .6rem; }
+}
