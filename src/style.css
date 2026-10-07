@@ -3635,3 +3635,7 @@ html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !imp
   .guestbook-form { z-index: 10; }
   #guestbook-layout, #guestbook-refresh { z-index: 30; }
 }
+
+@media (max-width: 700px) {
+  .guestbook-form input, .guestbook-form textarea { touch-action: manipulation; position: relative; z-index: 1; }
+}

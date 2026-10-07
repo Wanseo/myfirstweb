@@ -103,6 +103,14 @@ export function initGuestbook(root: HTMLElement) {
   const roaming = initGuestbookRoaming(root, notes)
   const url = import.meta.env.VITE_SUPABASE_URL?.trim()
   const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY?.trim()
+  for (const field of [name, message]) {
+    field.addEventListener('touchstart', () => {
+      if (matchMedia('(max-width: 700px)').matches && document.activeElement !== field) {
+        // Switch directly between fields before the keyboard can shift the layout.
+        field.focus({ preventScroll: true })
+      }
+    }, { passive: true })
+  }
   message.addEventListener('input', () => {
     root.querySelector('#guestbook-length')!.textContent = `${message.value.length} / 500`
   })
