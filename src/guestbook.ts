@@ -49,8 +49,10 @@ export const guestbookMarkup = `
         <path fill="#000" d="M10 11H14V12H15V16H14V17H10V16H9V12H10Z"/>
         <path fill="#303030" d="M10 12H14V16H10Z"/>
         <path fill="#707070" d="M12 12H14V14H12ZM11 15H12V16H11Z"/>
-        <path fill="#000" d="M20 0H21V2H23V3H21V5H20V3H18V2H20Z"/>
-        <path fill="#fff" d="M20 1H21V2H22V3H21V4H20V3H19V2H20Z"/>
+        <g transform="translate(5.125 .625) scale(.75)">
+          <path fill="#000" d="M20 0H21V2H23V3H21V5H20V3H18V2H20Z"/>
+          <path fill="#fff" d="M20 1H21V2H22V3H21V4H20V3H19V2H20Z"/>
+        </g>
         <path fill="#fff" d="M1 4H2V5H1Z"/>
       </svg>
     </button>
