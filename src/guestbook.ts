@@ -314,7 +314,13 @@ export function initGuestbook(root: HTMLElement) {
       render()
     } catch { /* Ignore corrupt local ownership data. */ }
   })
-  refresh.addEventListener('click', () => void load())
+  refresh.addEventListener('click', () => {
+    if (matchMedia('(max-width: 700px)').matches) {
+      location.reload()
+    } else {
+      void load()
+    }
+  })
   more.addEventListener('click', () => void load(true))
   const channel = client.channel('guestbook-board').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry, true)).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry))
   window.addEventListener('online', () => { if (active) void load() })
