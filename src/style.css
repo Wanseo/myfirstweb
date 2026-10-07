@@ -3577,4 +3577,3 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 
 .guestbook-camera-toggle svg { transform: translateY(1px); }
 
-.guestbook-camera-image { display: block; width: 36px; height: 36px; object-fit: cover; object-position: center; image-rendering: pixelated; transform: translateY(1px); }
