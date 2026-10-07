@@ -37,7 +37,7 @@ export function initGuestbookCamera(root: HTMLElement) {
           view.style.background = 'transparent' 
           const style = doc.createElement('style')
           style.textContent = '* { animation-play-state: paused !important; caret-color: transparent !important; }'
-          style.textContent += '.guestbook-bubble-frame::before, .guestbook-bubble-frame::after { display: none !important; }'
+          style.textContent += '.guestbook-bubble-frame::before, .guestbook-bubble-frame::after { content: none !important; display: none !important; background: transparent !important; }'
           doc.head.append(style)
           const camera = doc.querySelector<HTMLButtonElement>('#guestbook-camera')!
           camera.disabled = false
@@ -63,11 +63,26 @@ export function initGuestbookCamera(root: HTMLElement) {
           })
           doc.querySelectorAll<HTMLElement>('.guestbook-bubble-frame').forEach(frame => {
             const width = frame.offsetWidth + 10, height = frame.offsetHeight + 10
-            const polygon = (x: number, y: number, w: number, h: number) => `${x + 8},${y} ${x + w - 8},${y} ${x + w - 8},${y + 8} ${x + w},${y + 8} ${x + w},${y + h - 8} ${x + w - 8},${y + h - 8} ${x + w - 8},${y + h} ${x + 8},${y + h} ${x + 8},${y + h - 8} ${x},${y + h - 8} ${x},${y + 8} ${x + 8},${y + 8}`
-            const image = doc.createElement('img')
-            image.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" shape-rendering="crispEdges"><polygon points="${polygon(0, 0, width, height)}" fill="#09201d"/><polygon points="${polygon(5, 5, width - 10, height - 10)}" fill="#f7f7f2"/></svg>`)
-            image.style.cssText = `position:absolute;left:-5px;top:-5px;width:${width}px;height:${height}px;`
-            frame.append(image)
+            const image = doc.createElement('canvas')
+            const scale = Math.min(devicePixelRatio || 1, 2)
+            image.width = Math.ceil(width * scale)
+            image.height = Math.ceil(height * scale)
+            const context = image.getContext('2d')!
+            context.scale(scale, scale)
+            const polygon = (x: number, y: number, w: number, h: number, color: string) => {
+              const points = [[x + 8, y], [x + w - 8, y], [x + w - 8, y + 8], [x + w, y + 8],
+                [x + w, y + h - 8], [x + w - 8, y + h - 8], [x + w - 8, y + h], [x + 8, y + h],
+                [x + 8, y + h - 8], [x, y + h - 8], [x, y + 8], [x + 8, y + 8]]
+              context.beginPath()
+              points.forEach(([px, py], index) => index ? context.lineTo(px!, py!) : context.moveTo(px!, py!))
+              context.closePath()
+              context.fillStyle = color
+              context.fill()
+            }
+            polygon(0, 0, width, height, '#09201d')
+            polygon(5, 5, width - 10, height - 10, '#f7f7f2')
+            image.style.cssText = `position:absolute;left:-5px;top:-5px;width:${width}px;height:${height}px;z-index:-1;pointer-events:none;`
+            frame.replaceWith(image)
           })
         },
       })
