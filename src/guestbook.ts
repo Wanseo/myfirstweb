@@ -22,7 +22,7 @@ export const guestbookMarkup = `
     <button class="guestbook-music-toggle" id="guestbook-music" type="button" aria-pressed="false" aria-label="8비트 배경 음악 켜기">
       <svg class="guestbook-music-icon" viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges">
         <path fill="#000" d="M18 2H21V19H20V20H19V21H16V20H15V19H14V16H15V15H17V14H18V7H17V8H15V9H13V10H11V11H10V21H9V22H8V23H5V22H4V21H3V18H4V17H6V16H7V8H8V7H10V6H12V5H14V4H16V3H18Z"/>
-        <g class="guestbook-music-slash">
+        <g class="guestbook-music-slash" transform="translate(24 0) scale(-1 1)">
           <path fill="#bceee2" d="M0 1H4V3H6V5H8V7H10V9H12V11H14V13H16V15H18V17H20V19H22V21H24V24H20V22H18V20H16V18H14V16H12V14H10V12H8V10H6V8H4V6H2V4H0Z"/>
           <path fill="#000" d="M1 2H3V4H5V6H7V8H9V10H11V12H13V14H15V16H17V18H19V20H21V22H23V24H21V22H19V20H17V18H15V16H13V14H11V12H9V10H7V8H5V6H3V4H1Z"/>
         </g>
