@@ -235,7 +235,23 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     if (!list && !reduced.matches) spread()
   })
   root.addEventListener('scroll', measure, { passive: true })
-  document.addEventListener('visibilitychange', start)
+  const resume = () => {
+    if (document.hidden) return
+    cancelAnimationFrame(frame)
+    frame = 0
+    previous = 0
+    measure()
+    start()
+  }
+  document.addEventListener('visibilitychange', resume)
+  window.addEventListener('pageshow', resume)
+  window.addEventListener('focus', resume)
+  root.addEventListener('guestbook-capture-complete', () => {
+    if (width > 700) return
+    resume()
+    window.setTimeout(resume, 300)
+    window.setTimeout(resume, 1200)
+  })
   applyLayout()
   void document.fonts.ready.then(() => { if (active && !list && !reduced.matches) spread() })
   return {
