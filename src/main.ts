@@ -40,9 +40,8 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <button class="menu-button" type="button" data-view="sampler" aria-selected="false">샘플러</button>
     <button class="menu-button" type="button" data-view="watertouch" aria-selected="false">WaterTouch</button>
     <button class="menu-button" type="button" data-view="balloon" aria-selected="false">Balloon</button>
+    <button class="menu-button" type="button" data-view="guestbook" aria-selected="false">방명록 ↗</button>
   </nav>
-
-  <button class="menu-button guestbook-menu" type="button" data-view="guestbook" aria-selected="false">방명록 ↗</button>
   ${guestbookMarkup}
 
   <div class="global-capture">
@@ -998,10 +997,9 @@ const switchView = (nextView: ViewName) => {
 
 const menuToggle = document.querySelector<HTMLButtonElement>('#menu-toggle')!
 const projectMenu = document.querySelector<HTMLElement>('#project-menu')!
-menuToggle.hidden = !otherExperiencesVisible
+menuToggle.hidden = false
 menuButtons.forEach(button => { button.hidden = !isViewAvailable(button.dataset.view as ViewName) })
 const setMenuOpen = (open: boolean) => {
-  open = open && otherExperiencesVisible
   projectMenu.hidden = !open
   menuToggle.setAttribute('aria-expanded', String(open))
   menuToggle.setAttribute('aria-label', open ? '다른 메뉴 닫기' : '다른 메뉴 열기')
@@ -1017,7 +1015,7 @@ menuToggle.addEventListener('keydown', (event) => {
   if (event.key === 'ArrowDown') {
     event.preventDefault()
     setMenuOpen(true)
-    projectMenu.querySelector<HTMLButtonElement>('button')?.focus()
+    projectMenu.querySelector<HTMLButtonElement>('button:not([hidden])')?.focus()
   }
 })
 
