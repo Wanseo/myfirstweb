@@ -138,10 +138,11 @@ export function initGuestbookCamera(root: HTMLElement) {
         const file = new File([blob], `guestbook-${stamp}.png`, { type: 'image/png' })
         if (typeof navigator.share === 'function' && navigator.canShare?.({ files: [file] })) {
           await share(file)
-        } else {
+          return
+        } else if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
           status.textContent = '이 앱은 이미지 공유를 지원하지 않아요. Safari에서 열어 주세요.'
+          return
         }
-        return
       }
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
