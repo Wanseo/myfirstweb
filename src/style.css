@@ -3530,3 +3530,5 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 @media (max-width: 700px) { .guestbook-pixel-star:nth-child(1) { left: 147px !important; } }
 
 .guestbook-pixel-star--above-list { position: fixed; }
+
+.menu-toggle[hidden], #project-menu .menu-button[hidden] { display: none !important; }

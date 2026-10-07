@@ -517,6 +517,9 @@ try {
 const guestbook = initGuestbook(document.querySelector<HTMLElement>('#guestbook-view')!)
 
 type ViewName = 'guestbook' | 'orbi' | 'juice' | 'dodge' | 'claw' | 'sampler' | 'watertouch' | 'balloon'
+// Temporarily keep the other experiences unavailable to visitors.
+const otherExperiencesVisible = false
+const isViewAvailable = (view: ViewName) => view === 'guestbook' || otherExperiencesVisible
 let activeView: ViewName = 'orbi'
 
 const messages = [
@@ -960,6 +963,7 @@ const resetGame = () => {
 }
 
 const switchView = (nextView: ViewName) => {
+  if (!isViewAvailable(nextView)) nextView = 'guestbook'
   if (activeView === nextView) return
 
   activeView = nextView
@@ -994,7 +998,10 @@ const switchView = (nextView: ViewName) => {
 
 const menuToggle = document.querySelector<HTMLButtonElement>('#menu-toggle')!
 const projectMenu = document.querySelector<HTMLElement>('#project-menu')!
+menuToggle.hidden = !otherExperiencesVisible
+menuButtons.forEach(button => { button.hidden = !isViewAvailable(button.dataset.view as ViewName) })
 const setMenuOpen = (open: boolean) => {
+  open = open && otherExperiencesVisible
   projectMenu.hidden = !open
   menuToggle.setAttribute('aria-expanded', String(open))
   menuToggle.setAttribute('aria-label', open ? '다른 메뉴 닫기' : '다른 메뉴 열기')
@@ -1025,7 +1032,7 @@ menuButtons.forEach((button) => {
 
 const syncViewFromHash = () => {
   const next = location.hash.slice(1)
-  const valid = menuButtons.some((button) => button.dataset.view === next)
+  const valid = menuButtons.some((button) => button.dataset.view === next && isViewAvailable(next as ViewName))
   switchView(valid ? next as ViewName : 'guestbook')
 }
 window.addEventListener('hashchange', syncViewFromHash)
