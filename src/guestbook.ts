@@ -293,6 +293,10 @@ export function initGuestbook(root: HTMLElement) {
       entries.set(saved.id, saved)
       render(wasEditing ? undefined : saved.id)
       resetEditor()
+      if (matchMedia('(max-width: 700px)').matches) {
+        if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
+        root.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+      }
       status.textContent = wasEditing ? '수정한 내용이 저장됐어요!' : canEdit ? '저장됐어요! 이 브라우저에서 list → 수정으로 바꿀 수 있어요.' : '' 
     } catch {
       status.textContent = '저장하지 못했어요. 입력 내용은 유지됩니다. 연결과 Supabase 설정을 확인해 주세요.'

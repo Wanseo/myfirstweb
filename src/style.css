@@ -3627,3 +3627,11 @@ html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !imp
   .guestbook-form button { padding: 3px 8px; font-size: .65rem; }
   #guestbook-length { font-size: .6rem; }
 }
+
+@media (max-width: 700px) {
+  .guestbook-view button, .menu-toggle, #project-menu button { touch-action: manipulation; }
+  .guestbook-form input, .guestbook-form textarea { font-size: 16px; line-height: 1.25; }
+  .guestbook-form button, #guestbook-layout, #guestbook-refresh { min-height: 44px; min-width: 44px; }
+  .guestbook-form { z-index: 10; }
+  #guestbook-layout, #guestbook-refresh { z-index: 30; }
+}
