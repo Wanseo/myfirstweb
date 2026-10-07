@@ -1,3 +1,4 @@
+import { initGuestbookCamera } from './guestbook-camera'
 import { initGuestbookMusic } from './guestbook-music'
 import { initGuestbookNight } from './guestbook-night'
 import { initGuestbookRoaming } from './guestbook-roaming'
@@ -28,6 +29,10 @@ export const guestbookMarkup = `
         </g>
       </svg>
     </button>
+    <button class="guestbook-camera-toggle" id="guestbook-camera" type="button" aria-label="화면 캡처해서 PNG 다운로드" data-html2canvas-ignore="true">
+      <svg viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges"><path fill="#000" fill-rule="evenodd" d="M8 3H16V4H18V6H21V7H22V19H21V20H3V19H2V7H3V6H6V4H8ZM9 5V7H15V5ZM9 9V10H7V12H6V16H7V18H9V19H15V18H17V16H18V12H17V10H15V9ZM9 11H15V12H16V16H15V17H9V16H8V12H9Z"/></svg>
+    </button>
+    <span id="guestbook-camera-status" class="guestbook-camera-status" role="status" data-html2canvas-ignore="true"></span>
     <div class="guestbook-night-sky" aria-hidden="true"><div class="guestbook-pixel-stars"></div><div class="guestbook-pixel-moon"></div></div>
     <div class="guestbook-shell">
       <div class="guestbook-workspace">
@@ -56,6 +61,7 @@ export const guestbookMarkup = `
   </main>`
 
 export function initGuestbook(root: HTMLElement) {
+  initGuestbookCamera(root)
   initGuestbookNight(root)
   const music = initGuestbookMusic(root)
   const form = root.querySelector<HTMLFormElement>('form')!

@@ -1,0 +1,70 @@
+import html2canvas from 'html2canvas'
+import dayLandscape from './assets/guestbook-landscape.svg?raw'
+import nightLandscape from './assets/guestbook-landscape-night.svg?raw'
+
+export function initGuestbookCamera(root: HTMLElement) {
+  const button = root.querySelector<HTMLButtonElement>('#guestbook-camera')!
+  const status = root.querySelector<HTMLElement>('#guestbook-camera-status')!
+  button.addEventListener('click', async () => {
+    if (button.disabled) return
+    button.disabled = true
+    button.setAttribute('aria-busy', 'true')
+    root.classList.add('is-capturing')
+    status.textContent = ''
+    try {
+      await document.fonts.ready
+      const canvas = await html2canvas(document.body, {
+        width: innerWidth, height: innerHeight, x: 0, y: 0,
+        scrollX: 0, scrollY: 0, scale: Math.min(devicePixelRatio || 1, 2),
+        useCORS: true, logging: false, backgroundColor: null,
+        onclone(doc) {
+          doc.body.style.background = 'transparent'
+          const view = doc.querySelector<HTMLElement>('#guestbook-view')!
+          view.style.background = 'transparent' 
+          const style = doc.createElement('style')
+          style.textContent = '* { animation-play-state: paused !important; caret-color: transparent !important; }'
+          style.textContent += '.guestbook-bubble-frame::before, .guestbook-bubble-frame::after { display: none !important; }'
+          doc.head.append(style)
+          doc.querySelectorAll<HTMLElement>('.guestbook-bubble-frame').forEach(frame => {
+            const width = frame.offsetWidth + 10, height = frame.offsetHeight + 10
+            const polygon = (x: number, y: number, w: number, h: number) => `${x + 8},${y} ${x + w - 8},${y} ${x + w - 8},${y + 8} ${x + w},${y + 8} ${x + w},${y + h - 8} ${x + w - 8},${y + h - 8} ${x + w - 8},${y + h} ${x + 8},${y + h} ${x + 8},${y + h - 8} ${x},${y + h - 8} ${x},${y + 8} ${x + 8},${y + 8}`
+            const image = doc.createElement('img')
+            image.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" shape-rendering="crispEdges"><polygon points="${polygon(0, 0, width, height)}" fill="#09201d"/><polygon points="${polygon(5, 5, width - 10, height - 10)}" fill="#f7f7f2"/></svg>`)
+            image.style.cssText = `position:absolute;left:-5px;top:-5px;width:${width}px;height:${height}px;`
+            frame.append(image)
+          })
+        },
+      })
+      // Paint the SVG landscape explicitly: html2canvas can omit fixed SVG backgrounds.
+      const landscape = new Image()
+      const svg = (root.classList.contains('is-night') ? nightLandscape : dayLandscape).replace('<svg ', '<svg width="105" height="54" ')
+      landscape.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg)
+      await landscape.decode()
+      const composed = document.createElement('canvas')
+      composed.width = canvas.width; composed.height = canvas.height
+      const context = composed.getContext('2d')!
+      context.imageSmoothingEnabled = false
+      const cover = Math.max(composed.width / 105, composed.height / 54)
+      context.drawImage(landscape, (composed.width - 105 * cover) / 2, (composed.height - 54 * cover) / 2, 105 * cover, 54 * cover)
+      context.drawImage(canvas, 0, 0)
+      const blob = await new Promise<Blob>((resolve, reject) => composed.toBlob(value => value ? resolve(value) : reject(new Error('PNG encoding failed')), 'image/png'))
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      const stamp = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date()).replace(/[^0-9]/g, '')
+      link.href = url
+      link.download = `guestbook-${stamp}.png`
+      document.body.append(link)
+      link.click()
+      link.remove()
+      window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+      status.textContent = '화면을 PNG로 저장했어요.'
+    } catch {
+      status.textContent = '화면 저장에 실패했어요. 다시 눌러 주세요.'
+    } finally {
+      root.classList.remove('is-capturing')
+      button.disabled = false
+      button.removeAttribute('aria-busy')
+      window.setTimeout(() => { status.textContent = '' }, 4000)
+    }
+  })
+}

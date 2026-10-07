@@ -3565,3 +3565,12 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 
 .guestbook-pixel-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .guestbook-avatar--rasterized > :not(.guestbook-pixel-canvas) { visibility: hidden; }
+
+.guestbook-camera-toggle { position: fixed; top: 18px; left: max(212px, calc((100% - 1400px) / 2 + 212px)); z-index: 510; display: grid; place-items: center; width: 44px; height: 44px; padding: 4px; border: 0; background: transparent; cursor: pointer; }
+.guestbook-camera-toggle svg { display: block; width: 36px; height: 36px; image-rendering: pixelated; }
+.guestbook-camera-toggle:hover { background: #bceee260; }
+.guestbook-camera-toggle:focus-visible { outline: 3px solid #4865ee; outline-offset: 4px; }
+.guestbook-camera-status { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 520; padding: 7px 12px; background: #bceee2; color: #09201d; border: 2px solid #09201d; font-size: .75rem; }
+.guestbook-camera-status:empty { display: none; }
+.is-capturing .guestbook-avatar { animation-play-state: paused; }
+@media (max-width: 700px) { .guestbook-camera-toggle { top: 12px; left: 186px; } }
