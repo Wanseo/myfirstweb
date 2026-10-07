@@ -30,7 +30,23 @@ export const guestbookMarkup = `
       </svg>
     </button>
     <button class="guestbook-camera-toggle" id="guestbook-camera" type="button" aria-label="화면 캡처해서 PNG 다운로드" data-html2canvas-ignore="true">
-      <svg viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges"><path fill="#000" fill-rule="evenodd" d="M8 3H16V4H18V6H21V7H22V19H21V20H3V19H2V7H3V6H6V4H8ZM9 5V7H15V5ZM9 9V10H7V12H6V16H7V18H9V19H15V18H17V16H18V12H17V10H15V9ZM9 11H15V12H16V16H15V17H9V16H8V12H9Z"/></svg>
+      <svg viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges">
+        <path fill="#666" d="M3 8H22V20H21V21H3V20H2V9H3Z"/>
+        <path fill="#000" d="M8 3H15V4H17V6H21V7H22V19H21V20H3V19H2V7H3V6H6V5H7V4H8Z"/>
+        <path fill="#929292" d="M8 4H15V5H16V7H21V19H3V8H7V6H8Z"/>
+        <path fill="#b9b9b9" d="M16 5H17V7H21V8H16Z"/>
+        <path fill="#666" d="M3 17H7V18H17V19H3Z"/>
+        <path fill="#000" d="M9 5H14V6H15V8H9Z"/>
+        <path fill="#e8eeee" d="M10 6H14V7H10Z"/>
+        <path fill="#aaa" d="M11 6H12V7H11Z"/>
+        <path fill="#000" d="M9 9H15V10H17V12H18V16H17V18H15V19H9V18H7V16H6V12H7V10H9Z"/>
+        <path fill="#d5dada" d="M9 10H15V11H16V12H17V16H16V17H15V18H9V17H8V16H7V12H8V11H9Z"/>
+        <path fill="#fff" d="M14 10H15V11H16V13H15V12H14Z"/>
+        <path fill="#000" d="M10 11H14V12H15V16H14V17H10V16H9V12H10Z"/>
+        <path fill="#303030" d="M10 12H14V16H10Z"/>
+        <path fill="#707070" d="M12 12H14V14H12ZM11 15H12V16H11Z"/>
+        <path fill="#222" d="M4 9H5V16H4Z"/>
+      </svg>
     </button>
     <span id="guestbook-camera-status" class="guestbook-camera-status" role="status" data-html2canvas-ignore="true"></span>
     <div class="guestbook-night-sky" aria-hidden="true"><div class="guestbook-pixel-stars"></div><div class="guestbook-pixel-moon"></div></div>
