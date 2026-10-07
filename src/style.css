@@ -3644,3 +3644,8 @@ html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !imp
   #guestbook-name { min-height: 44px; width: 100%; pointer-events: auto; }
   .guestbook-form label { touch-action: manipulation; }
 }
+
+@media (max-width: 700px) {
+  .guestbook-camera-status { border-radius: 0; background: #bceee2; box-shadow: none; }
+  .guestbook-camera-status button { appearance: none; -webkit-appearance: none; display: block; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: #09201d; font: inherit; }
+}

@@ -165,7 +165,7 @@ export function initGuestbookCamera(root: HTMLElement) {
       button.disabled = false
       button.removeAttribute('aria-busy')
       root.dispatchEvent(new Event('guestbook-capture-complete'))
-      window.setTimeout(() => { status.textContent = '' }, status.querySelector('button') ? 8000 : 4000)
+      window.setTimeout(() => { status.textContent = '' }, innerWidth <= 700 ? 2000 : 4000)
     }
   })
 }
