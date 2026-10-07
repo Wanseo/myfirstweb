@@ -1,3 +1,4 @@
+import { initClickSound } from './click-sound'
 import './style.css'
 import { guestbookMarkup, initGuestbook } from './guestbook'
 import flowerGirlRunner from './assets/flower-girl-runner.png'
@@ -1196,3 +1197,5 @@ requestAnimationFrame(() => {
 
 // Resolve the initial URL after all game handlers have initialized.
 syncViewFromHash()
+
+initClickSound()
