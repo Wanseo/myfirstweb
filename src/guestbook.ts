@@ -18,7 +18,7 @@ function parseEditKeys(value: unknown): Record<string, string> {
 
 export const guestbookMarkup = `
   <main class="view guestbook-view" id="guestbook-view" aria-hidden="true" hidden>
-    <button class="guestbook-night-toggle" id="guestbook-night" type="button" aria-pressed="false">day ☀</button>
+    <button class="guestbook-night-toggle" id="guestbook-night" type="button" aria-pressed="false">night ☾</button>
     <button class="guestbook-music-toggle" id="guestbook-music" type="button" aria-pressed="false" aria-label="8비트 배경 음악 켜기">
       <svg class="guestbook-music-icon" viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges">
         <path fill="#000" d="M18 2H21V19H20V20H19V21H16V20H15V19H14V16H15V15H17V14H18V7H17V8H15V9H13V10H11V11H10V21H9V22H8V23H5V22H4V21H3V18H4V17H6V16H7V8H8V7H10V6H12V5H14V4H16V3H18Z"/>

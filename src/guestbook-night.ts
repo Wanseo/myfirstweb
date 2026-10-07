@@ -37,7 +37,7 @@ export function initGuestbookNight(root: HTMLElement) {
   try { night = localStorage.getItem('guestbook-night') === 'true' } catch { /* Optional preference. */ }
   const apply = () => {
     root.classList.toggle('is-night', night)
-    button.textContent = night ? 'night ☾' : 'day ☀'
+    button.textContent = night ? 'day ☀' : 'night ☾'
     button.setAttribute('aria-pressed', String(night))
     button.setAttribute('aria-label', night ? '낮 배경으로 바꾸기' : '밤 배경으로 바꾸기')
   }
