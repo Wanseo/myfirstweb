@@ -39,13 +39,12 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   const inBounds = (walker: Walker, x: number, y: number) => x >= 24 && x <= Math.max(24, width - 92) && y >= minY(walker) && y <= Math.max(minY(walker), height - 120) && formCollision(x, y) <= formCollision(walker.x, walker.y) + .001
 
   const crowding = (walker: Walker, x: number, y: number) => {
-    // Mobile walkers can pass through one another; inBounds still protects the form.
-    if (width <= 700) return 0
+    const mobile = width <= 700
     const box = bounds(x, y, walker)
     const form = { left: formBounds.left - 12, right: formBounds.right + 12, top: formBounds.top - 12, bottom: formBounds.bottom + 12 }
-    let score = overlap(box, form) * 5
+    let score = mobile ? 0 : overlap(box, form) * 5
     for (const other of walkers) {
-      if (other !== walker) score += overlap(box, bounds(other.x, other.y, other))
+      if (other !== walker) score += overlap(box, bounds(other.x, other.y, other)) * (mobile ? .0005 : 1)
     }
     return score
   }
@@ -55,7 +54,8 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     const maxX = Math.max(24, width - 92)
     if (width <= 700 && !initial && walker.y < formBounds.bottom + 20) {
       // Reach the clear corridor beside the mobile form before heading downward.
-      const corridorX = formBounds.right + 24
+      const corridorStart = formBounds.right + 24
+      const corridorX = corridorStart + (walker.seed % 101) / 100 * Math.max(0, maxX - corridorStart)
       if (corridorX <= maxX) {
         const x = walker.x < corridorX - 2 ? corridorX : walker.x
         const y = walker.x < corridorX - 2 ? walker.y : Math.min(maxY, formBounds.bottom + 65)
@@ -155,7 +155,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
           const y = walker.y + Math.sin(angle + turn) * step
           if (!inBounds(walker, x, y)) continue
           const overlapScore = crowding(walker, x, y)
-          if (overlapScore > currentOverlap + .001 && !(walker.detourSoft && now < (walker.detourUntil ?? 0) && turn === 0)) continue
+          if (width > 700 && overlapScore > currentOverlap + .001 && !(walker.detourSoft && now < (walker.detourUntil ?? 0) && turn === 0)) continue
           const cost = overlapScore * 30 + Math.hypot(walker.targetX - x, walker.targetY - y)
           // A safe sideways route may temporarily lead away from the destination.
           // Remember it briefly so the character can go around an obstacle.
