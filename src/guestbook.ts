@@ -163,7 +163,8 @@ export function initGuestbook(root: HTMLElement) {
       portrait.append(author)
       const date = document.createElement('time')
       date.dateTime = entry.created_at
-      date.textContent = new Date(entry.created_at).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', year: 'numeric' })
+      const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Seoul', year: '2-digit', month: '2-digit', day: '2-digit' }).formatToParts(new Date(entry.created_at))
+      date.textContent = ['year', 'month', 'day'].map(type => parts.find(part => part.type === type)?.value).join('.')
       footer.append(date)
       if (editKeys[entry.id]) {
         const edit = document.createElement('button')
