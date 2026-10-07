@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180">
+  <defs>
+    <radialGradient id="lemon-skin" cx="35%" cy="26%" r="74%">
+      <stop offset="0" stop-color="#fff98a"/>
+      <stop offset=".55" stop-color="#f8d91d"/>
+      <stop offset="1" stop-color="#d7a900"/>
+    </radialGradient>
+    <filter id="shadow" x="-30%" y="-40%" width="160%" height="190%">
+      <feDropShadow dx="0" dy="10" stdDeviation="8" flood-color="#332400" flood-opacity=".28"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <path d="M195 57c16-9 26-24 27-41-18 1-34 9-45 23" fill="#4f9f43" stroke="#2b7030" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M30 96C35 49 76 22 127 25c50 3 86 30 83 70-4 42-47 68-97 64-50-3-88-25-83-63Z" fill="url(#lemon-skin)" stroke="#bd9700" stroke-width="6"/>
+    <path d="M36 95 18 84l16-8M208 94l17-10-17-9" fill="#efc617" stroke="#bd9700" stroke-width="5" stroke-linejoin="round"/>
+    <ellipse cx="92" cy="60" rx="32" ry="17" fill="#fff" opacity=".22" transform="rotate(-17 92 60)"/>
+    <g fill="#c5a300" opacity=".42">
+      <circle cx="66" cy="98" r="2.6"/><circle cx="91" cy="132" r="2.5"/><circle cx="132" cy="52" r="2.3"/>
+      <circle cx="157" cy="119" r="2.8"/><circle cx="178" cy="82" r="2.2"/><circle cx="112" cy="89" r="2"/>
+    </g>
+  </g>
+</svg>
