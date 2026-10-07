@@ -33,7 +33,7 @@ export const guestbookMarkup = `
         </g>
       </svg>
     </button>
-    <button class="guestbook-camera-toggle" id="guestbook-camera" type="button" aria-label="화면 캡처해서 PNG 다운로드" data-html2canvas-ignore="true">
+    <button class="guestbook-camera-toggle" id="guestbook-camera" type="button" aria-label="화면 캡처해서 PNG 다운로드">
       <svg viewBox="0 0 24 24" aria-hidden="true" shape-rendering="crispEdges">
         <path fill="#666" d="M3 8H22V20H21V21H3V20H2V9H3Z"/>
         <path fill="#000" d="M8 3H15V4H17V6H21V7H22V19H21V20H3V19H2V7H3V6H6V5H7V4H8Z"/>

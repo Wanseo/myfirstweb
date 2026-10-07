@@ -13,6 +13,20 @@ export function initGuestbookCamera(root: HTMLElement) {
     status.textContent = ''
     try {
       await document.fonts.ready
+      // Native form controls are rendered inconsistently by html2canvas.
+      const fields = [...root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('.guestbook-form input, .guestbook-form textarea')].map(field => {
+        const computed = getComputedStyle(field)
+        const placeholder = getComputedStyle(field, '::placeholder')
+        return {
+          id: field.id, text: field.value || field.placeholder,
+          multiline: field instanceof HTMLTextAreaElement,
+          width: field.getBoundingClientRect().width, height: field.getBoundingClientRect().height,
+          styles: Array.from(computed).map(property => [property, computed.getPropertyValue(property)]),
+          color: field.value ? computed.color : placeholder.color,
+          fontSize: field.value ? computed.fontSize : placeholder.fontSize,
+          scrollTop: field.scrollTop, scrollLeft: field.scrollLeft,
+        }
+      })
       const canvas = await html2canvas(document.body, {
         width: innerWidth, height: innerHeight, x: 0, y: 0,
         scrollX: 0, scrollY: 0, scale: Math.min(devicePixelRatio || 1, 2),
@@ -25,6 +39,28 @@ export function initGuestbookCamera(root: HTMLElement) {
           style.textContent = '* { animation-play-state: paused !important; caret-color: transparent !important; }'
           style.textContent += '.guestbook-bubble-frame::before, .guestbook-bubble-frame::after { display: none !important; }'
           doc.head.append(style)
+          const camera = doc.querySelector<HTMLButtonElement>('#guestbook-camera')!
+          camera.disabled = false
+          camera.removeAttribute('aria-busy')
+          fields.forEach(field => {
+            const original = doc.getElementById(field.id)!
+            const replacement = doc.createElement('div')
+            field.styles.forEach(([property, value]) => replacement.style.setProperty(property!, value!))
+            Object.assign(replacement.style, {
+              width: `${field.width}px`, height: `${field.height}px`, boxSizing: 'border-box',
+              overflow: 'hidden', display: 'flex', alignItems: field.multiline ? 'flex-start' : 'center',
+              color: field.color, fontSize: field.fontSize,
+            })
+            const text = doc.createElement('span')
+            text.textContent = field.text
+            Object.assign(text.style, {
+              whiteSpace: field.multiline ? 'pre-wrap' : 'pre', overflowWrap: 'break-word',
+              minWidth: '0', width: '100%', flexShrink: '0',
+              transform: `translate(${-field.scrollLeft}px, ${-field.scrollTop}px)`,
+            })
+            replacement.append(text)
+            original.replaceWith(replacement)
+          })
           doc.querySelectorAll<HTMLElement>('.guestbook-bubble-frame').forEach(frame => {
             const width = frame.offsetWidth + 10, height = frame.offsetHeight + 10
             const polygon = (x: number, y: number, w: number, h: number) => `${x + 8},${y} ${x + w - 8},${y} ${x + w - 8},${y + 8} ${x + w},${y + 8} ${x + w},${y + h - 8} ${x + w - 8},${y + h - 8} ${x + w - 8},${y + h} ${x + 8},${y + h} ${x + 8},${y + h - 8} ${x},${y + h - 8} ${x},${y + 8} ${x + 8},${y + 8}`
