@@ -3581,3 +3581,10 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !important; }
 
 .guestbook-view:is(.is-loading, .is-saving, .is-capturing), .guestbook-view:is(.is-loading, .is-saving, .is-capturing) * { cursor: url('./assets/guestbook-loading-cursor.svg') 16 16, wait !important; }
+
+/* Keep mobile list/reload controls above the composer. */
+@media (max-width: 700px) {
+  .guestbook-workspace { position: relative; }
+  .guestbook-form { margin-top: 58px; }
+  .guestbook-board-heading { position: absolute; top: 0; left: 0; width: min(100%, 250px); }
+}
