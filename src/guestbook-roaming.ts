@@ -7,6 +7,17 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   let previous = 0
   let list = false
   let pointer: { x: number; y: number } | undefined
+  const raisedLayers = new Map<string, number>()
+  let nextRaisedLayer = 100001
+  stage.addEventListener('pointerdown', event => {
+    if (innerWidth > 700 || !(event.target instanceof Element)) return
+    const note = event.target.closest<HTMLElement>('.guestbook-note')
+    const id = note?.dataset.entryId
+    if (!note || !id) return
+    const layer = nextRaisedLayer++
+    raisedLayers.set(id, layer)
+    note.style.setProperty('--mobile-layer', String(layer))
+  })
   document.addEventListener('pointermove', event => {
     if (event.pointerType !== 'touch') pointer = { x: event.clientX, y: event.clientY }
   }, { passive: true })
@@ -100,7 +111,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     }
   }
   const place = (walker: Walker) => {
-    walker.element.style.setProperty('--mobile-layer', String(1 + walker.seed % 100000))
+    walker.element.style.setProperty('--mobile-layer', String(raisedLayers.get(walker.element.dataset.entryId!) ?? 1 + walker.seed % 100000))
     walker.element.style.setProperty('--facing', String(walker.facing ?? 1))
     walker.element.style.transform = `translate(${Math.round(walker.x)}px, ${Math.round(walker.y)}px)`
     const mobile = width <= 700
