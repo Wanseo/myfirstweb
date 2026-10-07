@@ -3649,3 +3649,9 @@ html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !imp
   .guestbook-camera-status { border-radius: 0; background: #bceee2; box-shadow: none; }
   .guestbook-camera-status button { appearance: none; -webkit-appearance: none; display: block; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: #09201d; font: inherit; }
 }
+
+.guestbook-form input, .guestbook-form textarea { --guestbook-placeholder-rem: .72; }
+.guestbook-form input::placeholder, .guestbook-form textarea::placeholder { font-size: calc(var(--guestbook-placeholder-rem) * 1rem); }
+@media (max-width: 700px) {
+  .guestbook-form input, .guestbook-form textarea { --guestbook-placeholder-rem: .6; }
+}

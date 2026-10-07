@@ -41,13 +41,16 @@ export function initGuestbookCamera(root: HTMLElement) {
       const fields = [...root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('.guestbook-form input, .guestbook-form textarea')].map(field => {
         const computed = getComputedStyle(field)
         const placeholder = getComputedStyle(field, '::placeholder')
+        // iOS can report the input's 16px font for ::placeholder despite its smaller CSS font.
+        const placeholderRem = parseFloat(computed.getPropertyValue('--guestbook-placeholder-rem')) || .72
+        const placeholderSize = `${placeholderRem * parseFloat(getComputedStyle(document.documentElement).fontSize)}px`
         return {
           id: field.id, text: field.value || field.placeholder,
           multiline: field instanceof HTMLTextAreaElement,
           width: field.getBoundingClientRect().width, height: field.getBoundingClientRect().height,
           styles: Array.from(computed).map(property => [property, computed.getPropertyValue(property)]),
           color: field.value ? computed.color : placeholder.color,
-          fontSize: field.value ? computed.fontSize : placeholder.fontSize,
+          fontSize: field.value ? computed.fontSize : placeholderSize,
           fontFamily: computed.fontFamily,
           fontWeight: field.value ? computed.fontWeight : placeholder.fontWeight,
           lineHeight: computed.lineHeight,
