@@ -199,7 +199,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
           // Tiny avoidance corrections should not flip the sprite every frame.
           if (Math.abs(horizontal) > .05 && Math.sign(horizontal) !== facing) {
             walker.turnTravel = (walker.turnTravel ?? 0) + Math.abs(horizontal)
-            if (walker.turnTravel >= 6 && now - (walker.lastTurnAt ?? 0) >= 800) {
+            if (walker.turnTravel >= (width <= 700 ? 14 : 6) && now - (walker.lastTurnAt ?? 0) >= (width <= 700 ? 1600 : 800)) {
               walker.facing = Math.sign(horizontal)
               walker.lastTurnAt = now
               walker.turnTravel = 0

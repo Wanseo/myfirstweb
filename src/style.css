@@ -3655,3 +3655,11 @@ html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !imp
 @media (max-width: 700px) {
   .guestbook-form input, .guestbook-form textarea { --guestbook-placeholder-rem: .6; }
 }
+
+/* Keep mobile sprite pixels steady while characters cross each other. */
+@media (max-width: 700px) {
+  .guestbook-avatar--frame-0 { animation: none; transform: none; visibility: visible; }
+  .guestbook-avatar--frame-1 { display: none; }
+  .guestbook-avatar { left: -14px; }
+  .guestbook-note:hover, .guestbook-note:focus-within { z-index: auto; }
+}
