@@ -3540,9 +3540,9 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 @media (max-width: 700px) { .guestbook-music-toggle { top: 12px; left: 132px; font-size: .75rem; padding: 9px 8px; } }
 
 /* A black pixel note replaces the music label; the slash indicates mute. */
-.guestbook-music-toggle { width: 44px; height: 44px; min-height: 44px; display: grid; place-items: center; padding: 4px; border: 0; background: transparent; box-shadow: none; }
+.guestbook-music-toggle { width: 44px; height: 44px; min-height: 44px; display: grid; place-items: center; padding: 0; border: 0; background: transparent; box-shadow: none; }
 .guestbook-music-toggle:hover { background: #bceee260; }
-.guestbook-music-icon { display: block; width: 30px; height: 30px; image-rendering: pixelated; }
+.guestbook-music-icon { display: block; width: 36px; height: 36px; image-rendering: pixelated; }
 .guestbook-music-slash { display: none; }
 .guestbook-music-toggle.is-muted .guestbook-music-slash { display: block; }
 
@@ -3566,7 +3566,7 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .guestbook-pixel-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .guestbook-avatar--rasterized > :not(.guestbook-pixel-canvas) { visibility: hidden; }
 
-.guestbook-camera-toggle { position: fixed; top: 18px; left: max(212px, calc((100% - 1400px) / 2 + 212px)); z-index: 510; display: grid; place-items: center; width: 44px; height: 44px; padding: 4px; border: 0; background: transparent; cursor: pointer; }
+.guestbook-camera-toggle { position: fixed; top: 18px; left: max(212px, calc((100% - 1400px) / 2 + 212px)); z-index: 510; display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: transparent; cursor: pointer; }
 .guestbook-camera-toggle svg { display: block; width: 40px; height: 40px; image-rendering: pixelated; }
 .guestbook-camera-toggle:hover { background: #bceee260; }
 .guestbook-camera-toggle:focus-visible { outline: 3px solid #4865ee; outline-offset: 4px; }
@@ -3575,4 +3575,4 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .is-capturing .guestbook-avatar { animation-play-state: paused; }
 @media (max-width: 700px) { .guestbook-camera-toggle { top: 12px; left: 186px; } }
 
-.guestbook-camera-toggle svg { transform: translateY(1px); }
+.guestbook-camera-toggle svg { transform: translateY(3px); }
