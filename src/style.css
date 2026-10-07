@@ -3532,3 +3532,9 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .guestbook-pixel-star--above-list { position: fixed; }
 
 .menu-toggle[hidden], #project-menu .menu-button[hidden] { display: none !important; }
+
+/* Chiptune playback stays beside the day/night control. */
+.guestbook-music-toggle { position: fixed; top: 18px; left: max(158px, calc((100% - 1400px) / 2 + 158px)); z-index: 510; min-height: 44px; padding: 9px 12px; border: 2px solid #09201d; background: #bceee2; color: #09201d; box-shadow: 3px 3px 0 #09201d; font: bold .85rem monospace; cursor: pointer; }
+.guestbook-music-toggle:hover { background: #d7fff3; }
+.guestbook-music-toggle:focus-visible { outline: 3px solid #4865ee; outline-offset: 4px; }
+@media (max-width: 700px) { .guestbook-music-toggle { top: 12px; left: 132px; font-size: .75rem; padding: 9px 8px; } }

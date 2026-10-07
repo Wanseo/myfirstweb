@@ -1,3 +1,4 @@
+import { initGuestbookMusic } from './guestbook-music'
 import { initGuestbookNight } from './guestbook-night'
 import { initGuestbookRoaming } from './guestbook-roaming'
 import { createGuestbookAvatar, createGuestbookCharacterPicker } from './guestbook-avatar'
@@ -18,6 +19,7 @@ function parseEditKeys(value: unknown): Record<string, string> {
 export const guestbookMarkup = `
   <main class="view guestbook-view" id="guestbook-view" aria-hidden="true" hidden>
     <button class="guestbook-night-toggle" id="guestbook-night" type="button" aria-pressed="false">night ☾</button>
+    <button class="guestbook-music-toggle" id="guestbook-music" type="button" aria-pressed="false">music off ♫</button>
     <div class="guestbook-night-sky" aria-hidden="true"><div class="guestbook-pixel-stars"></div><div class="guestbook-pixel-moon"></div></div>
     <div class="guestbook-shell">
       <div class="guestbook-workspace">
@@ -47,6 +49,7 @@ export const guestbookMarkup = `
 
 export function initGuestbook(root: HTMLElement) {
   initGuestbookNight(root)
+  const music = initGuestbookMusic(root)
   const form = root.querySelector<HTMLFormElement>('form')!
   const name = root.querySelector<HTMLInputElement>('#guestbook-name')!
   const message = root.querySelector<HTMLTextAreaElement>('textarea')!
@@ -70,7 +73,7 @@ export function initGuestbook(root: HTMLElement) {
     submit.disabled = true
     refresh.disabled = true
     empty.textContent = 'Supabase 연결 후 방문자들의 이야기가 여기에 모입니다.'
-    return { setActive: (_active: boolean) => {} }
+    return { setActive: (active: boolean) => music.setActive(active) }
   }
   const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } })
   const entries = new Map<string, Entry>()
@@ -271,6 +274,7 @@ export function initGuestbook(root: HTMLElement) {
   window.addEventListener('pagehide', () => { void client.removeChannel(channel) })
   return {
     setActive(next: boolean) {
+      music.setActive(next)
       active = next
       roaming.setActive(next)
       if (!next) return
