@@ -48,6 +48,10 @@ export function initGuestbookCamera(root: HTMLElement) {
           styles: Array.from(computed).map(property => [property, computed.getPropertyValue(property)]),
           color: field.value ? computed.color : placeholder.color,
           fontSize: field.value ? computed.fontSize : placeholder.fontSize,
+          fontFamily: computed.fontFamily,
+          fontWeight: field.value ? computed.fontWeight : placeholder.fontWeight,
+          lineHeight: computed.lineHeight,
+          letterSpacing: computed.letterSpacing,
           scrollTop: field.scrollTop, scrollLeft: field.scrollLeft,
         }
       })
@@ -60,7 +64,7 @@ export function initGuestbookCamera(root: HTMLElement) {
           const view = doc.querySelector<HTMLElement>('#guestbook-view')!
           view.style.background = 'transparent' 
           const style = doc.createElement('style')
-          style.textContent = '* { animation-play-state: paused !important; caret-color: transparent !important; }'
+          style.textContent = '* { animation-play-state: paused !important; caret-color: transparent !important; -webkit-text-size-adjust: 100% !important; text-size-adjust: 100% !important; }'
           style.textContent += '.guestbook-note, .guestbook-note * { animation: none !important; transition: none !important; opacity: 1 !important; filter: none !important; }'
           style.textContent += '.guestbook-bubble-frame::before, .guestbook-bubble-frame::after { content: none !important; display: none !important; background: transparent !important; }'
           doc.head.append(style)
@@ -80,6 +84,8 @@ export function initGuestbookCamera(root: HTMLElement) {
             text.textContent = field.text
             Object.assign(text.style, {
               whiteSpace: field.multiline ? 'pre-wrap' : 'pre', overflowWrap: 'break-word',
+              fontSize: field.fontSize, fontFamily: field.fontFamily, fontWeight: field.fontWeight,
+              lineHeight: field.lineHeight, letterSpacing: field.letterSpacing, color: field.color,
               minWidth: '0', width: '100%', flexShrink: '0',
               transform: `translate(${-field.scrollLeft}px, ${-field.scrollTop}px)`,
             })
