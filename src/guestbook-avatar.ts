@@ -26,7 +26,16 @@ export function createGuestbookCharacterPicker() {
   }
 }
 
-export function createGuestbookAvatar(character: number, frame = 0, mixedColors: readonly string[] | false = false): HTMLImageElement | HTMLSpanElement {
+// Only four plain blob sprites receive mixed colours; animal/accessory sprites
+// keep their original colours, regardless of the visitor they are assigned to.
+const plainBlobPalettes: Record<number, readonly string[]> = {
+  3: ['#fff2df', '#fff2df', '#ffc3d3', '#f5acb4', '#ffdbbd'],
+  17: ['#faf4ff', '#faf4ff', '#d4c2ee', '#b8d9ed', '#e6d4f4'],
+  40: ['#f9efd9', '#f9efd9', '#dfbd92', '#cda883', '#ead6b4'],
+  54: ['#f8f5d9', '#f8f5d9', '#c6e4aa', '#a5d4bc', '#d8edc4'],
+}
+
+export function createGuestbookAvatar(character: number, frame = 0): HTMLImageElement | HTMLSpanElement {
   const avatar = document.createElement('img')
   avatar.className = `guestbook-avatar guestbook-avatar--frame-${frame}`
   avatar.alt = ''
@@ -34,6 +43,7 @@ export function createGuestbookAvatar(character: number, frame = 0, mixedColors:
   avatar.height = 77
   avatar.src = characters[character % characters.length]!
   const characterIndex = character % characters.length
+  const mixedColors = plainBlobPalettes[characterIndex] ?? false
   if (characterIndex < 56 && !mixedColors) return avatar
   // Every sprite uses the same pixel eyes and smile, aligned to its own face.
   const portrait = document.createElement('span')

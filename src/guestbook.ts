@@ -6,15 +6,6 @@ import { createClient } from '@supabase/supabase-js'
 
 type Entry = { id: string; name: string; message: string; created_at: string }
 
-const mixedCharacterPalettes: Record<string, readonly string[]> = {
-  'ab2b5ef1-46a8-4c81-9d76-1c86c6694b76': ['#f8f5d9', '#f8f5d9', '#c6e4aa', '#a5d4bc', '#d8edc4'],
-  '17871622-0e52-4f58-94b1-cd2dd1ca9311': ['#fff2df', '#fff2df', '#ffc3d3', '#f5acb4', '#ffdbbd'],
-  'f5443fb3-9797-4088-96c0-efcc6dc2beef': ['#faf4ff', '#faf4ff', '#d4c2ee', '#b8d9ed', '#e6d4f4'],
-  'c07005c3-b5bb-496b-8592-e603667c82a1': ['#f9efd9', '#f9efd9', '#dfbd92', '#cda883', '#ead6b4'],
-  '683052fb-2be6-4854-bd59-60f0f97605ec': ['#effcf6', '#effcf6', '#b8e8df', '#b5d4f0', '#d6f0e5'],
-}
-
-
 function parseEditKeys(value: unknown): Record<string, string> {
   const keys: Record<string, string> = {}
   if (value && typeof value === 'object' && !Array.isArray(value)) {
@@ -151,8 +142,7 @@ export function initGuestbook(root: HTMLElement) {
       walker.style.setProperty('--walk-delay', `${-(seed % 11)}s`)
       walker.style.setProperty('--stride-delay', `${-(seed % 5) * 0.12}s`)
       const character = pickCharacter(entry.id)
-      const mixedColors = mixedCharacterPalettes[entry.id] ?? false
-      walker.append(createGuestbookAvatar(character, 0, mixedColors), createGuestbookAvatar(character, 1, mixedColors))
+      walker.append(createGuestbookAvatar(character, 0), createGuestbookAvatar(character, 1))
       portrait.append(walker)
       const bubble = document.createElement('div')
       bubble.className = 'guestbook-bubble'
