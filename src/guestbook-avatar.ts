@@ -47,7 +47,8 @@ export function createGuestbookAvatar(character: number, frame = 0, mixedColors:
   face.classList.add('guestbook-dog-face')
   const { x, y } = expression
   const cleanup = expression.patches.map(patch => `<rect x="${patch.x}" y="${patch.y}" width="${patch.width}" height="${patch.height}" fill="${patch.color}"/>`).join('')
-  face.innerHTML = `${cleanup}<path fill="#000" d="M${x - 11} ${y}h5v6h-5ZM${x + 7} ${y}h5v6h-5ZM${x - 5} ${y + 7}h12v6h-12Z"/>`
+  const cleanupId = `guestbook-cleanup-${characterIndex}-${frame}`
+  face.innerHTML = `<defs><clipPath id="${cleanupId}"><path d="${expression.cleanupClip}"/></clipPath></defs><g clip-path="url(#${cleanupId})">${cleanup}</g><path fill="#000" d="M${x - 11} ${y}h5v6h-5ZM${x + 7} ${y}h5v6h-5ZM${x - 5} ${y + 7}h12v6h-12Z"/>`
   portrait.append(avatar)
   if (mixedColors) {
     const colors = mixedColors
