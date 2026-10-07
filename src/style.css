@@ -3607,3 +3607,7 @@ html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !imp
   .guestbook-form button { padding: 4px 11px; font-size: .75rem; }
   #guestbook-length { font-size: .7rem; }
 }
+
+@media (max-width: 700px) {
+  #guestbook-layout { position: fixed; top: 72px; left: 22px; }
+}
