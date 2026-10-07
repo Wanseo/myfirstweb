@@ -232,6 +232,7 @@ export function initGuestbook(root: HTMLElement) {
     try {
       const { data, error } = await client.from('guestbook_entries').select('id,name,message,created_at').order('created_at', { ascending: false }).order('id', { ascending: false }).range(targetPage * 50, targetPage * 50 + 49)
       if (error) throw error
+      if (!nextPage) entries.clear()
       for (const entry of data ?? []) entries.set(entry.id, entry)
       page = targetPage
       render()
@@ -322,7 +323,11 @@ export function initGuestbook(root: HTMLElement) {
     }
   })
   more.addEventListener('click', () => void load(true))
-  const channel = client.channel('guestbook-board').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry, true)).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry))
+  const channel = client.channel('guestbook-board').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry, true)).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry)).on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'guestbook_entries' }, (payload) => {
+    const id = payload.old.id as string | undefined
+    if (id && entries.delete(id)) render()
+  })
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && active) void load() })
   window.addEventListener('online', () => { if (active) void load() })
   window.addEventListener('pagehide', () => { void client.removeChannel(channel) })
   return {
