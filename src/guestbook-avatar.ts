@@ -25,12 +25,28 @@ export function createGuestbookCharacterPicker() {
   }
 }
 
-export function createGuestbookAvatar(character: number, frame = 0): HTMLImageElement {
+export function createGuestbookAvatar(character: number, frame = 0): HTMLImageElement | HTMLSpanElement {
   const avatar = document.createElement('img')
   avatar.className = `guestbook-avatar guestbook-avatar--frame-${frame}`
   avatar.alt = ''
   avatar.width = 54
   avatar.height = 77
   avatar.src = characters[character % characters.length]!
-  return avatar
+  const characterIndex = character % characters.length
+  const dog = characterIndex >= 72 && characterIndex <= 74
+  if (!dog) return avatar
+  // Draw the shared pixel expression over the dog's original facial features.
+  // Keeping the overlay inside the animation frame makes it move with the sprite.
+  const portrait = document.createElement('span')
+  portrait.className = avatar.className + ' guestbook-avatar--dog'
+  avatar.className = 'guestbook-dog-image'
+  const brown = characterIndex === 73
+  const face = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  face.setAttribute('viewBox', '0 0 128 128')
+  face.setAttribute('aria-hidden', 'true')
+  face.setAttribute('shape-rendering', 'crispEdges')
+  face.classList.add('guestbook-dog-face')
+  face.innerHTML = `<rect x="49" y="76" width="33" height="26" fill="${brown ? '#dab995' : '#fcfcfc'}"/><path fill="#000" d="M53 84H59V90H53ZM73 84H79V90H73ZM59 90H73V96H59Z"/>`
+  portrait.append(avatar, face)
+  return portrait
 }
