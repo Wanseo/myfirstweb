@@ -5,6 +5,10 @@ const characters = Object.entries(import.meta.glob<string>(
   { eager: true, query: '?url', import: 'default' },
 )).sort(([left], [right]) => left.localeCompare(right)).map(([, url]) => url)
 
+// Keep the horned, winged devil out of every future random assignment.
+const excludedCharacters = new Set([58])
+const eligibleCharacters = characters.map((_, index) => index).filter(index => !excludedCharacters.has(index))
+
 // Each character is used once before the next cycle starts. Keep existing
 // assignments intact when entries are refreshed, edited, or arrive in realtime.
 export function createGuestbookCharacterPicker() {
@@ -14,8 +18,8 @@ export function createGuestbookCharacterPicker() {
   return (id: string) => {
     const existing = assigned.get(id)
     if (existing !== undefined) return existing
-    const minimum = Math.min(...uses)
-    let available = uses.flatMap((count, index) => count === minimum ? [index] : [])
+    const minimum = Math.min(...eligibleCharacters.map(index => uses[index]!))
+    let available = eligibleCharacters.filter(index => uses[index] === minimum)
     if (available.length > 1) available = available.filter(index => index !== previous)
     const seed = [...id].reduce((total, char) => (total * 31 + char.charCodeAt(0)) >>> 0, 0)
     const index = available[seed % available.length]!
@@ -41,8 +45,9 @@ export function createGuestbookAvatar(character: number, frame = 0): HTMLImageEl
   avatar.alt = ''
   avatar.width = 54
   avatar.height = 77
-  avatar.src = characters[character % characters.length]!
-  const characterIndex = character % characters.length
+  const requestedCharacter = character % characters.length
+  const characterIndex = excludedCharacters.has(requestedCharacter) ? 0 : requestedCharacter
+  avatar.src = characters[characterIndex]!
   const mixedColors = plainBlobPalettes[characterIndex] ?? false
   if (characterIndex < 56 && !mixedColors) return avatar
   // Every sprite uses the same pixel eyes and smile, aligned to its own face.
