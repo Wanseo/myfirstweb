@@ -1,4 +1,4 @@
-type Walker = { element: HTMLElement; x: number; y: number; targetX: number; targetY: number; speed: number; seed: number; bubbleHeight: number; bubbleWidth: number; retryAt: number; detourAngle?: number; detourUntil?: number }
+type Walker = { element: HTMLElement; x: number; y: number; targetX: number; targetY: number; speed: number; seed: number; bubbleHeight: number; bubbleWidth: number; retryAt: number; detourAngle?: number; detourUntil?: number; facing?: number; turnTravel?: number; lastTurnAt?: number }
 
 export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   let walkers: Walker[] = []
@@ -73,6 +73,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     }
   }
   const place = (walker: Walker) => {
+    walker.element.style.setProperty('--facing', String(walker.facing ?? 1))
     walker.element.style.transform = `translate(${Math.round(walker.x)}px, ${Math.round(walker.y)}px)`
     const mobile = width <= 700
     const bubbleWidth = walker.bubbleWidth
@@ -122,7 +123,17 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
         const moved = Math.hypot(bestX - walker.x, bestY - walker.y) > .01
         walker.element.classList.toggle('is-paused', !moved)
         if (moved) {
-          walker.element.style.setProperty('--facing', bestX < walker.x ? '-1' : '1')
+          const horizontal = bestX - walker.x
+          const facing = walker.facing ?? 1
+          // Tiny avoidance corrections should not flip the sprite every frame.
+          if (Math.abs(horizontal) > .05 && Math.sign(horizontal) !== facing) {
+            walker.turnTravel = (walker.turnTravel ?? 0) + Math.abs(horizontal)
+            if (walker.turnTravel >= 6 && now - (walker.lastTurnAt ?? 0) >= 800) {
+              walker.facing = Math.sign(horizontal)
+              walker.lastTurnAt = now
+              walker.turnTravel = 0
+            }
+          } else if (Math.abs(horizontal) > .05) walker.turnTravel = 0
           walker.x = bestX; walker.y = bestY
         } else if (now >= walker.retryAt) {
           target(walker)
