@@ -3374,7 +3374,7 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .guestbook-note .guestbook-bubble time { font-size: .55rem; }
 .guestbook-note.is-new { animation: guestbook-arrive .35s steps(5, end); }
 @keyframes guestbook-arrive { from { opacity: 0; } to { opacity: 1; } }
-.guestbook-list-mode .guestbook-notes { position: static; display: grid; padding: 4px 5px 35px 0; pointer-events: auto; }
+.guestbook-list-mode .guestbook-notes { position: static; display: grid; padding: 32px 5px 35px 0; pointer-events: auto; }
 .guestbook-list-mode .guestbook-note { position: relative; width: auto; height: auto; display: grid; grid-template-columns: 66px minmax(0, 1fr); }
 .guestbook-list-mode .guestbook-portrait { min-height: 102px; }
 .guestbook-list-mode .guestbook-note .guestbook-bubble { position: relative; left: auto; right: auto; top: auto; bottom: auto; width: auto; padding: 12px; }
