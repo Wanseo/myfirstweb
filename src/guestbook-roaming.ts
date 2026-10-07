@@ -146,7 +146,9 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
         const dx = walker.targetX - walker.x, dy = walker.targetY - walker.y
         const angle = now < (walker.detourUntil ?? 0) ? walker.detourAngle! : Math.atan2(dy, dx)
         const step = walker.speed * dt
-        const currentOverlap = crowding(walker, walker.x, walker.y)
+        // On phones, spread destinations rather than steering away from moving peers.
+        // Changing peer positions must not make a walker reverse on every frame.
+        const currentOverlap = width <= 700 ? 0 : crowding(walker, walker.x, walker.y)
         let bestX = walker.x, bestY = walker.y
         let bestCost = currentOverlap * 30 + Math.hypot(dx, dy)
         let escape: { x: number; y: number; angle: number; cost: number } | undefined
@@ -155,7 +157,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
           const x = walker.x + Math.cos(angle + turn) * step
           const y = walker.y + Math.sin(angle + turn) * step
           if (!inBounds(walker, x, y)) continue
-          const overlapScore = crowding(walker, x, y)
+          const overlapScore = width <= 700 ? 0 : crowding(walker, x, y)
           if (width > 700 && overlapScore > currentOverlap + .001 && !(walker.detourSoft && now < (walker.detourUntil ?? 0) && turn === 0)) continue
           const cost = overlapScore * 30 + Math.hypot(walker.targetX - x, walker.targetY - y)
           // A safe sideways route may temporarily lead away from the destination.
@@ -181,7 +183,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
             const x = walker.x + Math.cos(escapeAngle) * step
             const y = walker.y + Math.sin(escapeAngle) * step
             if (!inBounds(walker, x, y)) continue
-            const cost = crowding(walker, x, y) * 30 + Math.hypot(walker.targetX - x, walker.targetY - y)
+            const cost = (width <= 700 ? 0 : crowding(walker, x, y)) * 30 + Math.hypot(walker.targetX - x, walker.targetY - y)
             if (cost < escapeCost) {
               escapeCost = cost; bestX = x; bestY = y
               walker.detourAngle = escapeAngle
