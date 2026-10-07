@@ -225,6 +225,7 @@ export function initGuestbook(root: HTMLElement) {
   const load = async (nextPage = false) => {
     if (loading) return
     loading = true
+    root.classList.add('is-loading')
     refresh.disabled = more.disabled = true
     const targetPage = nextPage ? page + 1 : 0
     if (!entries.size) empty.textContent = '이야기를 불러오는 중이에요…'
@@ -242,6 +243,7 @@ export function initGuestbook(root: HTMLElement) {
       if (!entries.size) empty.textContent = '연결 후 다시 불러와 주세요.'
     } finally {
       loading = false
+      root.classList.remove('is-loading')
       refresh.disabled = more.disabled = false
     }
   }
@@ -251,6 +253,7 @@ export function initGuestbook(root: HTMLElement) {
     const author = name.value.trim()
     const text = message.value.trim()
     if (!author || !text) { status.textContent = '이름과 하고 싶은 말을 모두 입력해 주세요.'; return }
+    root.classList.add('is-saving')
     submit.disabled = true
     cancelEdit.disabled = true
     submit.textContent = '전하는 중…'
@@ -294,6 +297,7 @@ export function initGuestbook(root: HTMLElement) {
     } catch {
       status.textContent = '저장하지 못했어요. 입력 내용은 유지됩니다. 연결과 Supabase 설정을 확인해 주세요.'
     } finally {
+      root.classList.remove('is-saving')
       submit.disabled = false
       cancelEdit.disabled = false
       submit.textContent = editingId ? '수정 저장' : 'commit'
