@@ -1,3 +1,4 @@
+import { initGuestbookNight } from './guestbook-night'
 import { initGuestbookRoaming } from './guestbook-roaming'
 import { createGuestbookAvatar } from './guestbook-avatar'
 import { createClient } from '@supabase/supabase-js'
@@ -16,6 +17,8 @@ function parseEditKeys(value: unknown): Record<string, string> {
 
 export const guestbookMarkup = `
   <main class="view guestbook-view" id="guestbook-view" aria-hidden="true" hidden>
+    <button class="guestbook-night-toggle" id="guestbook-night" type="button" aria-pressed="false">night ☾</button>
+    <div class="guestbook-night-sky" aria-hidden="true"><div class="guestbook-pixel-stars"></div><div class="guestbook-pixel-moon"></div></div>
     <div class="guestbook-shell">
       <div class="guestbook-workspace">
         <form class="guestbook-form">
@@ -43,6 +46,7 @@ export const guestbookMarkup = `
   </main>`
 
 export function initGuestbook(root: HTMLElement) {
+  initGuestbookNight(root)
   const form = root.querySelector<HTMLFormElement>('form')!
   const name = root.querySelector<HTMLInputElement>('#guestbook-name')!
   const message = root.querySelector<HTMLTextAreaElement>('textarea')!
