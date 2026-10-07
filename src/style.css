@@ -3550,3 +3550,7 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .guestbook-note .guestbook-bubble { max-width: min(220px, calc(100vw - 28px)); }
 .guestbook-note .guestbook-bubble > p { word-break: keep-all; overflow-wrap: anywhere; text-wrap: balance; }
 .guestbook-list-mode .guestbook-note .guestbook-bubble { max-width: min(220px, 100%); }
+
+/* Squat, wider sprites keep their existing walking area and name positions. */
+.guestbook-avatar { position: absolute; top: auto; bottom: 0; left: -4px; width: 62px; height: 54px; }
+@media (max-width: 700px) { .guestbook-avatar { left: -3.5px; width: 52px; height: 45px; } }
