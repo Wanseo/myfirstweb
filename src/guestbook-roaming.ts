@@ -100,6 +100,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     }
   }
   const place = (walker: Walker) => {
+    walker.element.style.setProperty('--mobile-layer', String(1 + walker.seed % 100000))
     walker.element.style.setProperty('--facing', String(walker.facing ?? 1))
     walker.element.style.transform = `translate(${Math.round(walker.x)}px, ${Math.round(walker.y)}px)`
     const mobile = width <= 700
