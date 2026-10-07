@@ -3524,4 +3524,7 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 
 @media (max-width: 700px) { .guestbook-pixel-star { width: calc(var(--star-size) * .7); height: calc(var(--star-size) * .7); } }
 
-@media (max-width: 700px) { .guestbook-pixel-star:nth-child(1) { left: 83% !important; top: 35% !important; } .guestbook-pixel-star:nth-child(2) { left: 78% !important; top: 68% !important; } .guestbook-pixel-star:nth-child(3) { left: 46% !important; top: 0% !important; } .guestbook-pixel-star:nth-child(4) { left: 91% !important; top: 88% !important; } }
+@media (max-width: 700px) { .guestbook-pixel-star:nth-child(1) { left: 147px !important; top: 2% !important; } .guestbook-pixel-star:nth-child(2) { left: 78% !important; top: 68% !important; } .guestbook-pixel-star:nth-child(3) { left: 46% !important; top: 0% !important; } .guestbook-pixel-star:nth-child(4) { left: 91% !important; top: 88% !important; } }
+
+.guestbook-pixel-star:nth-child(1) { left: max(173px, calc((100% - 1400px) / 2 + 173px)) !important; }
+@media (max-width: 700px) { .guestbook-pixel-star:nth-child(1) { left: 147px !important; } }
