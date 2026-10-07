@@ -3572,7 +3572,7 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 .guestbook-camera-toggle:focus-visible { outline: 3px solid #4865ee; outline-offset: 4px; }
 .guestbook-camera-status { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 520; padding: 7px 12px; background: #bceee2; color: #09201d; border: 2px solid #09201d; font-size: .75rem; }
 .guestbook-camera-status:empty { display: none; }
-.is-capturing .guestbook-avatar { animation-play-state: paused; }
+@media (min-width: 701px) { .is-capturing .guestbook-avatar { animation-play-state: paused; } }
 @media (max-width: 700px) { .guestbook-camera-toggle { top: 12px; left: 186px; } }
 
 .guestbook-camera-toggle svg { transform: translateY(0); }

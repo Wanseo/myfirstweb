@@ -13,6 +13,7 @@ export function initGuestbookCamera(root: HTMLElement) {
     status.textContent = ''
     try {
       await document.fonts.ready
+      const captureScale = Math.min(devicePixelRatio || 1, innerWidth <= 700 ? 1.5 : 2)
       // Native form controls are rendered inconsistently by html2canvas.
       const fields = [...root.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('.guestbook-form input, .guestbook-form textarea')].map(field => {
         const computed = getComputedStyle(field)
@@ -29,7 +30,7 @@ export function initGuestbookCamera(root: HTMLElement) {
       })
       const canvas = await html2canvas(document.body, {
         width: innerWidth, height: innerHeight, x: 0, y: 0,
-        scrollX: 0, scrollY: 0, scale: Math.min(devicePixelRatio || 1, 2),
+        scrollX: 0, scrollY: 0, scale: captureScale,
         useCORS: true, logging: false, backgroundColor: null,
         onclone(doc) {
           doc.body.style.background = 'transparent'
@@ -65,7 +66,7 @@ export function initGuestbookCamera(root: HTMLElement) {
           doc.querySelectorAll<HTMLElement>('.guestbook-bubble-frame').forEach(frame => {
             const width = frame.offsetWidth + 10, height = frame.offsetHeight + 10
             const image = doc.createElement('canvas')
-            const scale = Math.min(devicePixelRatio || 1, 2)
+            const scale = captureScale
             image.width = Math.ceil(width * scale)
             image.height = Math.ceil(height * scale)
             const context = image.getContext('2d')!
@@ -105,6 +106,8 @@ export function initGuestbookCamera(root: HTMLElement) {
       const stamp = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date()).replace(/[^0-9]/g, '')
       link.href = url
       link.download = `guestbook-${stamp}.png`
+      link.style.display = 'none'
+      link.rel = 'noopener'
       document.body.append(link)
       link.click()
       link.remove()

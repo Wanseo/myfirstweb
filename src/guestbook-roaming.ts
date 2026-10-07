@@ -112,7 +112,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   const tick = (now: number) => {
     frame = 0
     if (!active || list || reduced.matches || document.hidden) return
-    if (root.classList.contains('is-capturing')) { previous = 0; frame = requestAnimationFrame(tick); return }
+    if (width > 700 && root.classList.contains('is-capturing')) { previous = 0; frame = requestAnimationFrame(tick); return }
     const dt = previous ? Math.min((now - previous) / 1000, .05) : 0
     previous = now
     // Pause only the topmost character under the cursor, never keyboard focus.
