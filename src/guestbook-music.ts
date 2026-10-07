@@ -11,7 +11,7 @@ export function initGuestbookMusic(root: HTMLElement) {
   const button = root.querySelector<HTMLButtonElement>('#guestbook-music')!
   let context: AudioContext | undefined
   let master: GainNode | undefined
-  let enabled = false
+  let enabled = true
   let active = false
   let timer: number | undefined
   let step = 0
@@ -81,6 +81,13 @@ export function initGuestbookMusic(root: HTMLElement) {
     updateButton()
     void sync()
   })
+  // Browsers that block audible autoplay unlock playback on the first gesture.
+  const unlock = (event: Event) => {
+    if (event.target instanceof Node && button.contains(event.target)) return
+    if (enabled && context?.state !== 'running') void sync()
+  }
+  document.addEventListener('pointerdown', unlock)
+  document.addEventListener('keydown', unlock)
   document.addEventListener('visibilitychange', () => { void sync() })
   window.addEventListener('pagehide', stop)
   updateButton()
