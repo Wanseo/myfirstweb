@@ -110,6 +110,14 @@ export function initGuestbook(root: HTMLElement) {
         field.focus({ preventScroll: true })
       }
     }, { passive: true })
+    field.addEventListener('pointerdown', event => {
+      if (event instanceof PointerEvent && event.pointerType === 'touch' && matchMedia('(max-width: 700px)').matches) {
+        field.focus({ preventScroll: true })
+      }
+    })
+    root.querySelector<HTMLLabelElement>(`label[for="${field.id}"]`)?.addEventListener('touchstart', () => {
+      if (matchMedia('(max-width: 700px)').matches) field.focus({ preventScroll: true })
+    }, { passive: true })
   }
   message.addEventListener('input', () => {
     root.querySelector('#guestbook-length')!.textContent = `${message.value.length} / 500`
