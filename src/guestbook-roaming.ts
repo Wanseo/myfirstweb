@@ -29,8 +29,15 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   }
   type Bounds = ReturnType<typeof bounds>
   const overlap = (a: Bounds, b: Bounds) => Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
-  const minY = (walker: Walker) => Math.min(Math.max(0, height - 130), Math.max(180, walker.bubbleHeight + 115))
-  const inBounds = (walker: Walker, x: number, y: number) => x >= 24 && x <= Math.max(24, width - 92) && y >= minY(walker) && y <= Math.max(minY(walker), height - 120)
+  const minY = (walker: Walker) => Math.min(Math.max(0, height - 130), Math.max(60, walker.bubbleHeight + 35))
+  const formCollision = (x: number, y: number) => {
+    const mobile = width <= 700
+    const actor = { left: x - (mobile ? 13.5 : 16), right: x + (mobile ? 58.5 : 70), top: y, bottom: y + (mobile ? 64 : 77) }
+    const form = { left: formBounds.left - 8, right: formBounds.right + 8, top: formBounds.top - 8, bottom: formBounds.bottom + 8 }
+    return overlap(actor, form)
+  }
+  const inBounds = (walker: Walker, x: number, y: number) => x >= 24 && x <= Math.max(24, width - 92) && y >= minY(walker) && y <= Math.max(minY(walker), height - 120) && formCollision(x, y) <= formCollision(walker.x, walker.y) + .001
+
   const crowding = (walker: Walker, x: number, y: number) => {
     const box = bounds(x, y, walker)
     const form = { left: formBounds.left - 12, right: formBounds.right + 12, top: formBounds.top - 12, bottom: formBounds.bottom + 12 }
@@ -49,11 +56,11 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     for (let attempt = 0; attempt < (initial ? 400 : 70); attempt++) {
       // Prefer clear diagonal journeys between destinations. Collision avoidance
       // can still bend the path when another visitor is in the way.
-      const angle = Math.PI / 4 + Math.floor(Math.random() * 4) * Math.PI / 2
-      const travel = 80 + Math.random() * 220
+      const angle = (attempt % 3 === 0 ? 0 : Math.PI / 4) + Math.floor(Math.random() * 4) * Math.PI / 2
+      const travel = 35 + Math.random() * 220
       const x = initial ? 24 + Math.random() * Math.max(0, maxX - 24) : walker.x + Math.cos(angle) * travel
       const y = initial ? lowY + Math.random() * Math.max(0, maxY - lowY) : walker.y + Math.sin(angle) * travel
-      if (!initial && !inBounds(walker, x, y)) continue
+      if (!inBounds(walker, x, y)) continue
       const score = crowding(walker, x, y)
       if (score < bestScore) { bestX = x; bestY = y; bestScore = score }
       if (score === 0) break
