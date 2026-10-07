@@ -53,6 +53,19 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
     const lowY = minY(walker)
     const maxY = Math.max(lowY, height - 130)
     const maxX = Math.max(24, width - 92)
+    if (width <= 700 && !initial && walker.y < formBounds.bottom + 20) {
+      // Reach the clear corridor beside the mobile form before heading downward.
+      const corridorX = formBounds.right + 24
+      if (corridorX <= maxX) {
+        const x = walker.x < corridorX - 2 ? corridorX : walker.x
+        const y = walker.x < corridorX - 2 ? walker.y : Math.min(maxY, formBounds.bottom + 65)
+        if (inBounds(walker, x, y)) {
+          walker.targetX = x
+          walker.targetY = y
+          return
+        }
+      }
+    }
     let bestX = walker.x, bestY = walker.y, bestScore = Infinity
     // Spread new arrivals across the available space, including their bubbles.
     for (let attempt = 0; attempt < (initial ? 400 : 70); attempt++) {
