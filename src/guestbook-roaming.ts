@@ -30,13 +30,13 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   type Bounds = ReturnType<typeof bounds>
   const overlap = (a: Bounds, b: Bounds) => Math.max(0, Math.min(a.right, b.right) - Math.max(a.left, b.left)) * Math.max(0, Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top))
   const minY = (walker: Walker) => Math.min(Math.max(0, height - 130), Math.max(60, walker.bubbleHeight + 35))
-  const formCollision = (x: number, y: number) => {
+  const formCollision = (x: number, y: number, walker: Walker) => {
     const mobile = width <= 700
     const actor = { left: x - (mobile ? 13.5 : 16), right: x + (mobile ? 58.5 : 70), top: y, bottom: y + (mobile ? 64 : 77) }
     const form = { left: formBounds.left - 8, right: formBounds.right + 8, top: formBounds.top - 8, bottom: formBounds.bottom + 8 }
-    return overlap(actor, form)
+    return overlap(mobile ? bounds(x, y, walker) : actor, form)
   }
-  const inBounds = (walker: Walker, x: number, y: number) => x >= 24 && x <= Math.max(24, width - 92) && y >= minY(walker) && y <= Math.max(minY(walker), height - 120) && formCollision(x, y) <= formCollision(walker.x, walker.y) + .001
+  const inBounds = (walker: Walker, x: number, y: number) => x >= 24 && x <= Math.max(24, width - 92) && y >= minY(walker) && y <= Math.max(minY(walker), height - 120) && formCollision(x, y, walker) <= (width <= 700 ? 0 : formCollision(walker.x, walker.y, walker)) + .001
 
   const crowding = (walker: Walker, x: number, y: number) => {
     const mobile = width <= 700
@@ -127,6 +127,7 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
       walker.element.classList.remove('is-paused')
       {
         if (!inBounds(walker, walker.x, walker.y)) {
+          if (width <= 700 && formCollision(walker.x, walker.y, walker) > 0) target(walker, true)
           walker.x = Math.max(24, Math.min(Math.max(24, width - 92), walker.x))
           walker.y = Math.max(minY(walker), Math.min(Math.max(minY(walker), height - 120), walker.y))
           target(walker)
