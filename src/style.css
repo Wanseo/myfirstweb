@@ -3498,3 +3498,9 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
   #project-menu { top: 66px; right: 12px; }
   .guestbook-menu { top: 12px; right: 72px; padding: 12px 16px; }
 }
+
+/* Author-only edit controls are available in list view. */
+.guestbook-note .guestbook-edit-button { display: none; }
+.guestbook-list-mode .guestbook-note .guestbook-edit-button { display: inline-block; padding: 3px 9px; background: #bceee2; font-size: .7rem; box-shadow: 2px 2px 0 #09201d; }
+#guestbook-edit-cancel[hidden] { display: none; }
+.guestbook-form-footer { flex-wrap: wrap; }

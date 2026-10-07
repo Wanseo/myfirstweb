@@ -4,6 +4,16 @@ import { createClient } from '@supabase/supabase-js'
 
 type Entry = { id: string; name: string; message: string; created_at: string }
 
+function parseEditKeys(value: unknown): Record<string, string> {
+  const keys: Record<string, string> = {}
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    for (const [id, token] of Object.entries(value)) {
+      if (/^[a-f0-9-]{36}$/.test(id) && typeof token === 'string' && /^[a-f0-9]{64}$/.test(token)) keys[id] = token
+    }
+  }
+  return keys
+}
+
 export const guestbookMarkup = `
   <main class="view guestbook-view" id="guestbook-view" aria-hidden="true" hidden>
     <div class="guestbook-shell">
@@ -17,7 +27,7 @@ export const guestbookMarkup = `
           <div class="guestbook-composer-fields">
           <label for="guestbook-name">name</label><input id="guestbook-name" name="name" maxlength="30" placeholder="어떤 이름으로 남길까요?" required autocomplete="nickname">
           <label for="guestbook-message">message</label><textarea id="guestbook-message" name="message" maxlength="500" rows="6" placeholder="오늘의 기분, 인사, 짧은 이야기…" required></textarea>
-          <div class="guestbook-form-footer"><span id="guestbook-length">0 / 500</span><button type="submit">commit</button></div>
+          <div class="guestbook-form-footer"><span id="guestbook-length">0 / 500</span><button type="submit">commit</button><button id="guestbook-edit-cancel" type="button" hidden>취소</button></div>
           <p class="guestbook-status" id="guestbook-status" role="status" aria-live="polite"></p>
           </div>
         </form>
@@ -37,6 +47,7 @@ export function initGuestbook(root: HTMLElement) {
   const name = root.querySelector<HTMLInputElement>('#guestbook-name')!
   const message = root.querySelector<HTMLTextAreaElement>('textarea')!
   const submit = form.querySelector<HTMLButtonElement>('[type="submit"]')!
+  const cancelEdit = root.querySelector<HTMLButtonElement>('#guestbook-edit-cancel')!
   const status = root.querySelector<HTMLElement>('#guestbook-status')!
   const connection = root.querySelector<HTMLElement>('#guestbook-connection')!
   const notes = root.querySelector<HTMLElement>('#guestbook-notes')!
@@ -59,6 +70,36 @@ export function initGuestbook(root: HTMLElement) {
   }
   const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } })
   const entries = new Map<string, Entry>()
+  const ownershipKey = `guestbook-edit-keys:${new URL(url).host}`
+  let editKeys: Record<string, string> = {}
+  try {
+    editKeys = parseEditKeys(JSON.parse(localStorage.getItem(ownershipKey) ?? '{}'))
+  } catch { /* Reading remains available when browser storage is disabled. */ }
+  let editingId: string | null = null
+  const saveKeys = () => {
+    editKeys = { ...parseEditKeys(JSON.parse(localStorage.getItem(ownershipKey) ?? '{}')), ...editKeys }
+    localStorage.setItem(ownershipKey, JSON.stringify(editKeys))
+  }
+  const resetEditor = () => {
+    editingId = null
+    cancelEdit.hidden = true
+    submit.textContent = 'commit'
+    form.reset()
+    root.querySelector('#guestbook-length')!.textContent = '0 / 500'
+  }
+  const beginEdit = (entry: Entry) => {
+    if (submit.disabled) return
+    editingId = entry.id
+    name.value = entry.name
+    message.value = entry.message
+    root.querySelector('#guestbook-length')!.textContent = `${entry.message.length} / 500`
+    submit.textContent = '수정 저장'
+    cancelEdit.hidden = false
+    status.textContent = '내 글을 수정하고 있어요.'
+    form.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    message.focus({ preventScroll: true })
+  }
+  cancelEdit.addEventListener('click', () => { resetEditor(); status.textContent = '' })
   let page = 0
   let loading = false
   let started = false
@@ -105,6 +146,15 @@ export function initGuestbook(root: HTMLElement) {
       date.dateTime = entry.created_at
       date.textContent = new Date(entry.created_at).toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', year: 'numeric' })
       footer.append(date)
+      if (editKeys[entry.id]) {
+        const edit = document.createElement('button')
+        edit.type = 'button'
+        edit.className = 'guestbook-edit-button'
+        edit.textContent = '수정'
+        edit.setAttribute('aria-label', `${entry.name}님의 내 글 수정`)
+        edit.addEventListener('click', () => beginEdit(entry))
+        footer.append(edit)
+      }
       bubble.append(frame, tail, body, footer)
       note.append(portrait, bubble)
       fragment.append(note)
@@ -152,25 +202,63 @@ export function initGuestbook(root: HTMLElement) {
     const text = message.value.trim()
     if (!author || !text) { status.textContent = '이름과 하고 싶은 말을 모두 입력해 주세요.'; return }
     submit.disabled = true
+    cancelEdit.disabled = true
     submit.textContent = '전하는 중…'
     status.textContent = ''
     try {
-      const { data, error } = await client.from('guestbook_entries').insert({ name: author, message: text }).select('id,name,message,created_at').single()
-      if (error) throw error
-      merge(data, true)
-      form.reset()
-      root.querySelector('#guestbook-length')!.textContent = '0 / 500'
-      status.textContent = '당신의 이야기가 전해졌어요!'
+      let saved: Entry
+      let canEdit = false
+      if (editingId) {
+        const { data, error } = await client.rpc('edit_guestbook_entry', {
+          p_entry_id: editingId, p_name: author, p_message: text, p_edit_token: editKeys[editingId],
+        }).single<Entry>()
+        if (error) throw error
+        saved = data
+        canEdit = true
+      } else {
+        const token = [...crypto.getRandomValues(new Uint8Array(32))].map(value => value.toString(16).padStart(2, '0')).join('')
+        // Verify persistent storage before creating an editable entry.
+        saveKeys()
+        const { data, error } = await client.rpc('create_guestbook_entry', {
+          p_name: author, p_message: text, p_edit_token: token,
+        }).single<Entry>()
+        if (error?.code === 'PGRST202') {
+          // Existing sites keep accepting entries until the additive SQL is run.
+          const legacy = await client.from('guestbook_entries').insert({ name: author, message: text }).select('id,name,message,created_at').single<Entry>()
+          if (legacy.error) throw legacy.error
+          saved = legacy.data
+        } else {
+          if (error) throw error
+          saved = data!
+          editKeys[saved.id] = token
+          saveKeys()
+          canEdit = true
+        }
+      }
+      const wasEditing = editingId !== null
+      // Re-render even if Realtime delivered the row before its private key was stored.
+      entries.set(saved.id, saved)
+      render(wasEditing ? undefined : saved.id)
+      resetEditor()
+      status.textContent = wasEditing ? '수정한 내용이 저장됐어요!' : canEdit ? '저장됐어요! 이 브라우저에서 목록 보기 → 수정으로 바꿀 수 있어요.' : '저장됐어요! 수정 기능은 Supabase 추가 설정 후 작성한 글부터 사용할 수 있어요.' 
     } catch {
       status.textContent = '저장하지 못했어요. 입력 내용은 유지됩니다. 연결과 Supabase 설정을 확인해 주세요.'
     } finally {
       submit.disabled = false
-      submit.textContent = 'commit'
+      cancelEdit.disabled = false
+      submit.textContent = editingId ? '수정 저장' : 'commit'
     }
+  })
+  window.addEventListener('storage', (event) => {
+    if (event.key !== ownershipKey) return
+    try {
+      editKeys = parseEditKeys(JSON.parse(event.newValue ?? '{}'))
+      render()
+    } catch { /* Ignore corrupt local ownership data. */ }
   })
   refresh.addEventListener('click', () => void load())
   more.addEventListener('click', () => void load(true))
-  const channel = client.channel('guestbook-board').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry, true))
+  const channel = client.channel('guestbook-board').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry, true)).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry))
   window.addEventListener('online', () => { if (active) void load() })
   window.addEventListener('pagehide', () => { void client.removeChannel(channel) })
   return {
