@@ -39,6 +39,8 @@ export function initGuestbookRoaming(root: HTMLElement, stage: HTMLElement) {
   const inBounds = (walker: Walker, x: number, y: number) => x >= 24 && x <= Math.max(24, width - 92) && y >= minY(walker) && y <= Math.max(minY(walker), height - 120) && formCollision(x, y) <= formCollision(walker.x, walker.y) + .001
 
   const crowding = (walker: Walker, x: number, y: number) => {
+    // Mobile walkers can pass through one another; inBounds still protects the form.
+    if (width <= 700) return 0
     const box = bounds(x, y, walker)
     const form = { left: formBounds.left - 12, right: formBounds.right + 12, top: formBounds.top - 12, bottom: formBounds.bottom + 12 }
     let score = overlap(box, form) * 5
