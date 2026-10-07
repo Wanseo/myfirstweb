@@ -2,7 +2,7 @@ export function initClickSound() {
   const voices = Array.from({ length: 4 }, () => {
     const audio = new Audio(`${import.meta.env.BASE_URL}audio/click.mp3`)
     audio.preload = 'auto'
-    audio.volume = 0.7
+    audio.volume = 1
     return audio
   })
   let nextVoice = 0
