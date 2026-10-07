@@ -1,5 +1,7 @@
 name: Deploy to GitHub Pages
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,6 +19,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      - uses: actions/configure-pages@v5
+        id: pages
       - run: npm ci
       - name: Verify Supabase configuration
         env:
@@ -27,10 +31,10 @@ jobs:
           test -n "$VITE_SUPABASE_PUBLISHABLE_KEY" || { echo 'Set VITE_SUPABASE_PUBLISHABLE_KEY in repository secrets'; exit 1; }
       - run: npm run build
         env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}/
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: dist
   deploy:
