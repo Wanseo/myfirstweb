@@ -3576,3 +3576,6 @@ body.guestbook-active .guestbook-menu { background: #edf5db; border: 2px solid #
 @media (max-width: 700px) { .guestbook-camera-toggle { top: 12px; left: 186px; } }
 
 .guestbook-camera-toggle svg { transform: translateY(0); }
+
+/* Transparent pixel cursor, with its hotspot at the arrow tip. */
+html, body, body * { cursor: url('./assets/guestbook-cursor.svg') 2 0, auto !important; }
