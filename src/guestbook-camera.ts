@@ -37,6 +37,7 @@ export function initGuestbookCamera(root: HTMLElement) {
           view.style.background = 'transparent' 
           const style = doc.createElement('style')
           style.textContent = '* { animation-play-state: paused !important; caret-color: transparent !important; }'
+          style.textContent += '.guestbook-note, .guestbook-note * { animation: none !important; transition: none !important; opacity: 1 !important; filter: none !important; }'
           style.textContent += '.guestbook-bubble-frame::before, .guestbook-bubble-frame::after { content: none !important; display: none !important; background: transparent !important; }'
           doc.head.append(style)
           const camera = doc.querySelector<HTMLButtonElement>('#guestbook-camera')!
