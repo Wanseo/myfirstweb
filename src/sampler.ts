@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 const PAD_KEYS = ['q', 'w', 'e', 'a', 's', 'd', 'z', 'x', 'c'] as const
 type PadKey = (typeof PAD_KEYS)[number]
 
@@ -168,6 +169,7 @@ export const initSampler = (root: HTMLElement) => {
 
   const stopLoop = () => {
     if (!loopState) return
+    trackEvent('sampler_loop_end', {}, 'sampler')
     window.clearInterval(loopState.interval)
     loopState.sources.forEach((source) => {
       try { source.stop() } catch { /* Source already ended. */ }
@@ -186,6 +188,7 @@ export const initSampler = (root: HTMLElement) => {
 
   const startLoop = (recording: Recording) => {
     stopLoop()
+    trackEvent('sampler_loop_start', {}, 'sampler')
     resumeAudio()
     const sources = new Set<AudioBufferSourceNode>()
     const firstCycleAt = audioContext.currentTime + 0.045
@@ -284,6 +287,7 @@ export const initSampler = (root: HTMLElement) => {
     stopLoop()
     if (selected) startLoop(selected)
     isRecording = true
+    trackEvent('sampler_record_start', { mode: selected ? 'overdub' : 'new' }, 'sampler')
     pendingEvents = []
     recordStartedAt = selected && loopState ? loopState.nextCycleAt - selected.duration : audioContext.currentTime
     recordStartedAtPerformance = performance.now()
@@ -299,6 +303,7 @@ export const initSampler = (root: HTMLElement) => {
     const selected = recordings.find((recording) => recording.id === selectedRecordingId)
     const elapsed = Math.max(0.5, audioContext.currentTime - recordStartedAt)
     isRecording = false
+    trackEvent('sampler_record_end', { duration_ms: Math.round(elapsed * 1000), note_count: pendingEvents.length, mode: selected ? 'overdub' : 'new' }, 'sampler')
     stopLoop()
     if (selected) {
       selected.events.push(...pendingEvents)
@@ -361,6 +366,7 @@ export const initSampler = (root: HTMLElement) => {
 
   const beginPadInput = (inputId: string, key: PadKey) => {
     if (!active || activeInputs.has(inputId)) return
+    trackEvent('sampler_pad', { pad_key: key }, 'sampler', 500)
     activeInputs.set(inputId, key)
     updatePressedVisual(key)
     playLivePad(pads.get(key)!)
@@ -388,6 +394,7 @@ export const initSampler = (root: HTMLElement) => {
     if (type === 'pitch-up') pad.settings.pitch = clamp(pad.settings.pitch + 1, -12, 12)
     if (type === 'speed-down') pad.settings.speed = clamp(Number((pad.settings.speed - 0.1).toFixed(1)), 0.5, 2)
     if (type === 'speed-up') pad.settings.speed = clamp(Number((pad.settings.speed + 0.1).toFixed(1)), 0.5, 2)
+    trackEvent('sampler_pad_edit', { action: type, pad_key: editingKey }, 'sampler')
     renderEditor()
     resumeAudio()
     playAudioBuffer(pad)

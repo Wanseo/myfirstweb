@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 import * as THREE from 'three'
 
 type MachineState = 'aiming' | 'lowering' | 'readyToGrab' | 'closing' | 'lifting' | 'carrying' | 'dropping' | 'returning'
@@ -460,6 +461,7 @@ export const initClawMachine = (root: HTMLElement) => {
     if (!active) return
     if (state === 'aiming') {
       pressedKeys.clear()
+      trackEvent('claw_attempt', {}, 'claw')
       changeState('lowering')
       setStatus('LOWERING', '집게가 선택한 위치로 내려가고 있어요')
       return
@@ -497,6 +499,7 @@ export const initClawMachine = (root: HTMLElement) => {
         if (plush.exitProgress === 1 && !plush.won) {
           plush.won = true
           wonCount += 1
+          trackEvent('claw_prize', { score: wonCount }, 'claw')
           prizeCount.textContent = String(wonCount)
           setStatus('YOU GOT IT!', `${plush.name} 획득!`)
         }
@@ -564,6 +567,7 @@ export const initClawMachine = (root: HTMLElement) => {
     }
 
     if (state === 'returning' && moveClawTo(0, -0.15, 2.45, delta)) {
+      trackEvent('claw_cycle_complete', {}, 'claw')
       changeState('aiming')
       setStatus('READY', '방향키로 다음 인형의 위치를 정해 주세요')
     }

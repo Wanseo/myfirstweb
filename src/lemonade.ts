@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 import {
   FilesetResolver,
   HandLandmarker,
@@ -205,11 +206,13 @@ export const initLemonade = (root: HTMLElement) => {
   const startCamera = async () => {
     if (starting || stream) return
     if (!navigator.mediaDevices?.getUserMedia) {
+      trackEvent('camera_error', { reason: 'unsupported' }, 'juice')
       setStatus('CAMERA ERROR', '이 브라우저에서는 카메라를 사용할 수 없어요.')
       startPanel.hidden = false
       return
     }
 
+    trackEvent('camera_request', {}, 'juice')
     starting = true
     startButton.disabled = true
     startButton.textContent = '카메라 준비 중…'
@@ -234,6 +237,7 @@ export const initLemonade = (root: HTMLElement) => {
       stream = nextStream
       video.srcObject = nextStream
       await video.play()
+      trackEvent('camera_ready', {}, 'juice')
       startPanel.hidden = true
       root.classList.add('camera-ready')
       setStatus('TRACKING', '왼손은 레몬을 짜고, 오른손은 컵을 움직여요.')
@@ -247,6 +251,7 @@ export const initLemonade = (root: HTMLElement) => {
       startPanel.hidden = false
       root.classList.remove('camera-ready')
       const permissionDenied = error instanceof DOMException && ['NotAllowedError', 'PermissionDeniedError'].includes(error.name)
+      trackEvent('camera_error', { reason: permissionDenied ? 'permission_denied' : 'initialization_failed' }, 'juice')
       const message = permissionDenied
         ? '브라우저 주소창의 카메라 권한을 허용한 뒤 다시 눌러 주세요.'
         : '손 추적 모델을 시작하지 못했어요. 새로고침한 뒤 다시 시도해 주세요.'
@@ -260,6 +265,7 @@ export const initLemonade = (root: HTMLElement) => {
   }
 
   const stopCamera = () => {
+    if (stream) trackEvent('camera_stop', {}, 'juice')
     cancelAnimationFrame(animationFrame)
     animationFrame = 0
     latestResult = null
@@ -386,6 +392,7 @@ export const initLemonade = (root: HTMLElement) => {
     }
 
     if (held.juice <= 0.01) {
+      trackEvent('lemon_squeezed', {}, 'juice')
       held.juice = 0
       held.state = 'falling'
       held.vx = (Math.random() - 0.5) * 90
@@ -590,6 +597,8 @@ export const initLemonade = (root: HTMLElement) => {
     })
   }
 
+  let completionTracked = false
+
   const renderFrame = (time: number) => {
     if (!active || !stream) return
     resizeCanvas()
@@ -615,6 +624,10 @@ export const initLemonade = (root: HTMLElement) => {
     drawHands(hands)
 
     if (lemons.every((lemon) => lemon.state === 'gone')) {
+      if (!completionTracked) {
+        completionTracked = true
+        trackEvent('juice_complete', { juice_amount: Math.round(juiceInCup) }, 'juice')
+      }
       setStatus('ALL SQUEEZED', '레모네이드 완성! 다시 시작해서 한 잔 더 만들어 보세요.')
     } else if (!hands.length) {
       setStatus('SHOW YOUR HANDS', '양손이 카메라에 잘 보이도록 들어 주세요.')
@@ -624,7 +637,11 @@ export const initLemonade = (root: HTMLElement) => {
   }
 
   startButton.addEventListener('click', () => void startCamera())
-  resetButton.addEventListener('click', resetGame)
+  resetButton.addEventListener('click', () => {
+    trackEvent('example_restart', {}, 'juice')
+    completionTracked = false
+    resetGame()
+  })
   window.addEventListener('resize', resizeCanvas)
   resetGame()
 
@@ -633,6 +650,7 @@ export const initLemonade = (root: HTMLElement) => {
       active = nextActive
       if (active) {
         resizeCanvas()
+        completionTracked = false
         resetGame()
         startPanel.hidden = false
         startMessage.innerHTML = '카메라는 손의 움직임을 인식하는 데만 사용되며<br>영상은 저장되거나 전송되지 않습니다.'

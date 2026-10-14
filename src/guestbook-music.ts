@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 // An original looping chiptune, synthesized locally without audio files.
 const melody = [
   76, 79, 81, 79, 76, 74, 72, 0, 76, 79, 84, 83, 81, 79, 76, 0,
@@ -76,6 +77,7 @@ export function initGuestbookMusic(root: HTMLElement) {
   }
   button.addEventListener('click', () => {
     enabled = !enabled
+    trackEvent('guestbook_music', { enabled }, 'guestbook')
     if (enabled) step = 0
     updateButton()
     void sync()

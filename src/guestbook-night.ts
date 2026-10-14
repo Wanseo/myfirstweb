@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 export function initGuestbookNight(root: HTMLElement) {
   const button = root.querySelector<HTMLButtonElement>('#guestbook-night')!
   const stars = root.querySelector<HTMLElement>('.guestbook-pixel-stars')!
@@ -43,6 +44,7 @@ export function initGuestbookNight(root: HTMLElement) {
   }
   button.addEventListener('click', () => {
     night = !night
+    trackEvent('guestbook_theme', { theme: night ? 'night' : 'day' }, 'guestbook')
     apply()
     try { localStorage.setItem('guestbook-night', String(night)) } catch { /* Keep toggle working without storage. */ }
   })

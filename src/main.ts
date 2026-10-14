@@ -1,3 +1,4 @@
+import { trackEvent, trackExampleView } from './analytics'
 import { initClickSound } from './click-sound'
 import './style.css'
 import { guestbookMarkup, initGuestbook } from './guestbook'
@@ -635,6 +636,7 @@ window.addEventListener('pointerdown', (event) => {
   nextExpressionAt = performance.now() + 720
 
   const bounds = orb.getBoundingClientRect()
+  trackEvent('orbi_wink', {}, 'orbi', 1000)
   const winkSide = event.clientX < bounds.left + bounds.width / 2 ? 'wink-left' : 'wink-right'
 
   window.clearTimeout(winkTimer)
@@ -805,6 +807,7 @@ const startRound = () => {
 const clearRound = () => {
   if (roundStatus !== 'active') return
 
+  trackEvent('dodge_answer', { result: 'correct' }, 'dodge')
   roundStatus = 'cleared'
   challengePanel.classList.add('is-success')
   typingInput.readOnly = true
@@ -822,6 +825,7 @@ const clearRound = () => {
 const failRound = () => {
   if (roundStatus !== 'active') return
 
+  trackEvent('dodge_answer', { result: 'incorrect' }, 'dodge')
   roundStatus = 'failed'
   challengePanel.classList.add('is-error')
   typingInput.readOnly = true
@@ -910,6 +914,7 @@ const removeLetter = (letter: FallingLetter) => {
 const finishGame = (collidingLetter: FallingLetter) => {
   if (!gameRunning) return
 
+  trackEvent('dodge_game_over', { score }, 'dodge')
   gameRunning = false
   roundStatus = 'failed'
   window.clearTimeout(nextRoundTimer)
@@ -966,6 +971,7 @@ const switchView = (nextView: ViewName) => {
   if (!isViewAvailable(nextView)) nextView = 'guestbook'
   if (activeView === nextView) return
 
+  trackExampleView(nextView)
   activeView = nextView
   views.forEach((view) => {
     const selected = view.id === `${nextView}-view`
@@ -1095,7 +1101,10 @@ document.querySelector<HTMLElement>('#dodge-view')!.addEventListener('pointerdow
   }
 })
 
-restartButton.addEventListener('click', resetGame)
+restartButton.addEventListener('click', () => {
+  trackEvent('example_restart', {}, 'dodge')
+  resetGame()
+})
 
 window.addEventListener('resize', () => {
   const bounds = getRunnerBounds()

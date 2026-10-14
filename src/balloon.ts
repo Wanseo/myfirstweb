@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 import {
   FilesetResolver,
   HandLandmarker,
@@ -326,6 +327,7 @@ export const initBalloon = (root: HTMLElement) => {
         .filter(({ balloon, distance }) => distance < Math.max(18, balloon.rx * 0.38))
         .sort((first, second) => first.distance - second.distance)[0]
       if (!candidate) return
+      trackEvent('balloon_grab', {}, 'balloon', 1000)
       candidate.balloon.holderKey = hand.key
       occupiedHands.add(hand.key)
     })
@@ -411,6 +413,7 @@ export const initBalloon = (root: HTMLElement) => {
     burstRings.push({ x: balloon.x, y: balloon.y, radius: balloon.rx * 0.4, life: 0.34, maxLife: 0.34, color: balloon.lightColor })
     playPop(balloon.x, balloon.rx)
     poppedCount += 1
+    trackEvent('balloon_pop', { score: poppedCount }, 'balloon')
     balloons = balloons.filter((candidate) => candidate.id !== balloon.id)
     updateScore()
   }
@@ -615,6 +618,7 @@ export const initBalloon = (root: HTMLElement) => {
   }
 
   const stopCamera = () => {
+    if (stream) trackEvent('camera_stop', {}, 'balloon')
     cancelAnimationFrame(animationFrame)
     animationFrame = 0
     stream?.getTracks().forEach((track) => track.stop())
@@ -662,11 +666,13 @@ export const initBalloon = (root: HTMLElement) => {
   const startCamera = async () => {
     if (starting || stream) return
     if (!navigator.mediaDevices?.getUserMedia) {
+      trackEvent('camera_error', { reason: 'unsupported' }, 'balloon')
       const message = '카메라를 지원하는 최신 브라우저에서 다시 시도해 주세요.'
       startMessage.textContent = message
       setStatus('CAMERA ERROR', message)
       return
     }
+    trackEvent('camera_request', {}, 'balloon')
     starting = true
     const audioReady = prepareAudio()
     startButton.disabled = true
@@ -689,6 +695,7 @@ export const initBalloon = (root: HTMLElement) => {
       await video.play()
       resizeCanvas()
       resetScene()
+      trackEvent('camera_ready', {}, 'balloon')
       startPanel.hidden = true
       root.classList.add('camera-ready')
       setStatus('READY TO PLAY', '검지로 풍선을 터뜨리고 핀치로 끈을 잡아 보세요.')
@@ -700,6 +707,7 @@ export const initBalloon = (root: HTMLElement) => {
       console.error('Balloon 카메라 또는 손 추적 초기화에 실패했습니다.', error)
       nextStream?.getTracks().forEach((track) => track.stop())
       const denied = error instanceof DOMException && ['NotAllowedError', 'PermissionDeniedError'].includes(error.name)
+      trackEvent('camera_error', { reason: denied ? 'permission_denied' : 'initialization_failed' }, 'balloon')
       const message = denied
         ? '브라우저 주소창에서 카메라 권한을 허용한 뒤 다시 눌러 주세요.'
         : '카메라와 손 추적 모델을 시작하지 못했어요. 새로고침한 뒤 다시 시도해 주세요.'

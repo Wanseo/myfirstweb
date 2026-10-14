@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 import {
   FilesetResolver,
   HandLandmarker,
@@ -1045,6 +1046,7 @@ export const initWaterTouch = (root: HTMLElement) => {
     if (pose.closed && !memory.wasClosed && now >= memory.cooldownUntil) memory.armedAt = now
     if (pose.open && !memory.wasOpen && memory.armedAt > 0 && now - memory.armedAt < 2200 && now >= memory.cooldownUntil) {
       const visible = fishSchool.toggleFeeder({ x: pose.x, y: pose.y })
+      trackEvent('water_feeder_toggle', { enabled: visible }, 'watertouch')
       feederMessage = visible ? '먹이통이 나타났어요. 통 가까이에서 엄지와 검지를 집어 잡아 보세요.' : '먹이통을 물속에서 치웠어요.'
       feederMessageUntil = now + 2200
       suppressWaterAudioUntil = now + 1200
@@ -1141,6 +1143,7 @@ export const initWaterTouch = (root: HTMLElement) => {
   }
 
   const stopCamera = () => {
+    if (stream) trackEvent('camera_stop', {}, 'watertouch')
     cancelAnimationFrame(animationFrame)
     animationFrame = 0
     stream?.getTracks().forEach((track) => track.stop())
@@ -1187,6 +1190,7 @@ export const initWaterTouch = (root: HTMLElement) => {
 
     const visibleTracks = Array.from(tracks.values()).filter((track) => time - track.lastSeen < 220)
     const visibleHands = Array.from(handPoses.values()).filter((pose) => time - pose.lastSeen < 220)
+    if (visibleTracks.length) trackEvent('water_touch', {}, 'watertouch', 5000)
     const detectedHands = latestResult?.landmarks.length ?? 0
     const foodState = fishSchool.getFoodState()
     const waterSoundAllowed = foodState === 'hidden' && time >= suppressWaterAudioUntil
@@ -1232,10 +1236,12 @@ export const initWaterTouch = (root: HTMLElement) => {
   const startCamera = async () => {
     if (starting || stream) return
     if (!navigator.mediaDevices?.getUserMedia) {
+      trackEvent('camera_error', { reason: 'unsupported' }, 'watertouch')
       setStatus('CAMERA ERROR', '이 브라우저에서는 카메라를 사용할 수 없어요.')
       startMessage.textContent = '카메라를 지원하는 최신 브라우저에서 다시 시도해 주세요.'
       return
     }
+    trackEvent('camera_request', {}, 'watertouch')
     starting = true
     const audioReady = prepareAudio()
     startButton.disabled = true
@@ -1259,6 +1265,7 @@ export const initWaterTouch = (root: HTMLElement) => {
       renderer.reset()
       fishSchool.resize()
       fishSchool.reset()
+      trackEvent('camera_ready', {}, 'watertouch')
       startPanel.hidden = true
       root.classList.add('camera-ready')
       setStatus('SURFACE READY', '손가락 끝으로 화면의 수면을 천천히 저어 보세요.')
@@ -1270,6 +1277,7 @@ export const initWaterTouch = (root: HTMLElement) => {
       console.error('WaterTouch 카메라 또는 손 추적 초기화에 실패했습니다.', error)
       nextStream?.getTracks().forEach((track) => track.stop())
       const denied = error instanceof DOMException && ['NotAllowedError', 'PermissionDeniedError'].includes(error.name)
+      trackEvent('camera_error', { reason: denied ? 'permission_denied' : 'initialization_failed' }, 'watertouch')
       const message = denied
         ? '브라우저 주소창에서 카메라 권한을 허용한 뒤 다시 눌러 주세요.'
         : '카메라와 손 추적 모델을 시작하지 못했어요. 새로고침한 뒤 다시 시도해 주세요.'

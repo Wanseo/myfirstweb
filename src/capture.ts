@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 import html2canvas from 'html2canvas'
 
 type CaptureKind = 'photo' | 'video'
@@ -215,6 +216,7 @@ export const initGlobalCapture = () => {
       await drawCurrentFrame()
       const blob = await canvasToBlob(captureCanvas)
       showResult(blob, 'photo', `interactive-${makeStamp()}.png`)
+      trackEvent('capture_photo')
       setToast('사진 촬영 완료')
     } catch (error) {
       console.error('사진 촬영에 실패했습니다.', error)
@@ -265,6 +267,7 @@ export const initGlobalCapture = () => {
     elements.timer.textContent = '00:00'
     if (blob.size > 0) {
       showResult(blob, 'video', `interactive-${makeStamp()}.${extension}`)
+      trackEvent('capture_video_end', { duration_ms: Date.now() - recordingStartedAt })
       setToast('영상 촬영 완료')
     } else {
       setToast('저장할 영상 데이터가 없어요')
@@ -301,6 +304,7 @@ export const initGlobalCapture = () => {
       })
       recorder.start(250)
       recordingStartedAt = Date.now()
+      trackEvent('capture_video_start')
       elements.button.setAttribute('aria-label', '영상 촬영 종료')
       elements.timer.textContent = '00:00'
       timerInterval = window.setInterval(updateRecordingTime, 250)
@@ -394,6 +398,7 @@ export const initGlobalCapture = () => {
         title: 'Interactive capture',
         files: [new File([resultBlob], resultFileName, { type: resultBlob.type })],
       })
+      trackEvent('capture_share')
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return
       setToast('공유할 수 없어요. 저장 버튼을 이용해 주세요.')

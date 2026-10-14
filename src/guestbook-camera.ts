@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 import html2canvas from 'html2canvas'
 import dayLandscape from './assets/guestbook-landscape.svg?raw'
 import nightLandscape from './assets/guestbook-landscape-night.svg?raw'
@@ -9,6 +10,7 @@ export function initGuestbookCamera(root: HTMLElement) {
   const share = async (file: File) => {
     try {
       await navigator.share({ files: [file] })
+      trackEvent('capture_share', {}, 'guestbook')
       pendingShare = undefined
       status.textContent = ''
     } catch (error) {
@@ -133,6 +135,7 @@ export function initGuestbookCamera(root: HTMLElement) {
       context.drawImage(landscape, (composed.width - 105 * cover) / 2, (composed.height - 54 * cover) / 2, 105 * cover, 54 * cover)
       context.drawImage(canvas, 0, 0)
       const blob = await new Promise<Blob>((resolve, reject) => composed.toBlob(value => value ? resolve(value) : reject(new Error('PNG encoding failed')), 'image/png'))
+      trackEvent('capture_photo', {}, 'guestbook')
       const stamp = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date()).replace(/[^0-9]/g, '')
       if (innerWidth <= 700) {
         const file = new File([blob], `guestbook-${stamp}.png`, { type: 'image/png' })

@@ -1,3 +1,4 @@
+import { trackEvent } from './analytics'
 import { initGuestbookCamera } from './guestbook-camera'
 import { initGuestbookMusic } from './guestbook-music'
 import { initGuestbookNight } from './guestbook-night'
@@ -270,6 +271,7 @@ export function initGuestbook(root: HTMLElement) {
     const author = name.value.trim()
     const text = message.value.trim()
     if (!author || !text) { status.textContent = '이름과 하고 싶은 말을 모두 입력해 주세요.'; return }
+    trackEvent('guestbook_submit', { operation: editingId ? 'edit' : 'create' }, 'guestbook')
     root.classList.add('is-saving')
     submit.disabled = true
     cancelEdit.disabled = true
@@ -306,6 +308,7 @@ export function initGuestbook(root: HTMLElement) {
         }
       }
       const wasEditing = editingId !== null
+      trackEvent('guestbook_save', { operation: wasEditing ? 'edit' : 'create' }, 'guestbook')
       // Re-render even if Realtime delivered the row before its private key was stored.
       entries.set(saved.id, saved)
       render(wasEditing ? undefined : saved.id)
@@ -316,6 +319,7 @@ export function initGuestbook(root: HTMLElement) {
       }
       status.textContent = wasEditing ? '수정한 내용이 저장됐어요!' : canEdit ? '저장됐어요! 이 브라우저에서 list → 수정으로 바꿀 수 있어요.' : '' 
     } catch {
+      trackEvent('guestbook_save_error', { operation: editingId ? 'edit' : 'create' }, 'guestbook')
       status.textContent = '저장하지 못했어요. 입력 내용은 유지됩니다. 연결과 Supabase 설정을 확인해 주세요.'
     } finally {
       root.classList.remove('is-saving')
@@ -338,7 +342,10 @@ export function initGuestbook(root: HTMLElement) {
       void load()
     }
   })
-  more.addEventListener('click', () => void load(true))
+  more.addEventListener('click', () => {
+    trackEvent('guestbook_load_more', {}, 'guestbook')
+    void load(true)
+  })
   const channel = client.channel('guestbook-board').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry, true)).on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'guestbook_entries' }, (payload) => merge(payload.new as Entry)).on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'guestbook_entries' }, (payload) => {
     const id = payload.old.id as string | undefined
     if (id && entries.delete(id)) render()
